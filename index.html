@@ -26,6 +26,15 @@
       position: sticky; top: 0; z-index: 100;
     }
     .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo { transform-origin: 28px 41px; transition: transform 0.6s ease; }
+    .nav-brand:hover .nav-logo { animation: leafSway 1.2s ease-in-out; }
+    @keyframes leafSway {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-6deg); }
+      50% { transform: rotate(5deg); }
+      75% { transform: rotate(-3deg); }
+      100% { transform: rotate(0deg); }
+    }
     .nav-brand-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--olive); letter-spacing: 0.12em; line-height: 1; }
     .nav-brand-sub { font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brown-light); margin-top: 3px; }
     .nav-right { display: flex; align-items: center; gap: 1.5rem; }
@@ -273,8 +282,7 @@
 <!-- NAV -->
 <nav>
 <a href="#" class="nav-brand">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" width="40" height="40" role="img" aria-label="Alambú" style="flex-shrink:0;">
-      <circle cx="28" cy="28" r="27" fill="none" stroke="#B8924A" stroke-width="1"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" width="40" height="40" role="img" aria-label="Alambú" class="nav-logo" style="flex-shrink:0;">      <circle cx="28" cy="28" r="27" fill="none" stroke="#B8924A" stroke-width="1"/>
       <circle cx="28" cy="28" r="23" fill="none" stroke="#6B7C5C" stroke-width="0.5"/>
       <path d="M28 41 C28 36 27 31 28 26 C29 21 27 17 28 13" fill="none" stroke="#6B7C5C" stroke-width="1.4" stroke-linecap="round"/>
       <path d="M28 30 C24 29 21 27 20 23 C24 23 27 25 28 28" fill="#8A9E76" stroke="#6B7C5C" stroke-width="0.8" stroke-linejoin="round"/>
