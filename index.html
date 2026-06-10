@@ -88,6 +88,17 @@
     .service-desc-small { font-size: 11.5px; color: var(--brown-light); line-height: 1.5; }
 
     /* ── STEP 2: CALENDARIO ── */
+    /* ── PROFESSIONAL PICKER ── */
+    .prof-picker { margin-top: 1.5rem; }
+    .prof-options { display: flex; gap: 0.7rem; flex-wrap: wrap; }
+    .prof-option {
+      padding: 10px 18px; border: 1.5px solid var(--border); border-radius: 6px;
+      font-size: 12px; cursor: pointer; transition: all 0.2s; color: var(--brown); background: var(--cream-mid);
+      user-select: none;
+    }
+    .prof-option:hover { border-color: var(--olive-light); }
+    .prof-option.selected { background: var(--olive); border-color: var(--olive); color: #fff; font-weight: 500; }
+
     .calendar-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem; }
     @media (max-width: 700px) { .calendar-layout { grid-template-columns: 1fr; } }
 
@@ -326,6 +337,12 @@
   <div class="step-panel" id="panel2">
     <div class="step-title">Elegí fecha y horario</div>
     <p class="step-subtitle">Atendemos de lunes a sábado de 9:30 a 20:00 hs</p>
+
+    <div class="prof-picker" id="profPicker">
+      <p class="form-label" style="margin-bottom:0.6rem;">¿Con quién querés atenderte?</p>
+      <div class="prof-options" id="profOptions"></div>
+    </div>
+
     <div class="calendar-layout">
       <div>
         <div class="calendar-box">
@@ -413,6 +430,10 @@
         <span class="summary-val" id="sumHora">—</span>
       </div>
       <div class="summary-row">
+        <span class="summary-key">Profesional</span>
+        <span class="summary-val" id="sumProfesional">—</span>
+      </div>
+      <div class="summary-row">
         <span class="summary-key">Nombre</span>
         <span class="summary-val" id="sumNombre">—</span>
       </div>
@@ -428,7 +449,7 @@
       <button class="btn-back" onclick="goTo(3)">← Volver</button>
       <button class="btn-confirm" onclick="confirmarTurno()">Confirmar turno ✓</button>
     </div>
-    </div>
+  </div>
 
   <!-- STEP 5: CONFIRMADO -->
   <div class="step-panel" id="panel5">
@@ -617,7 +638,7 @@ async function cargarDisponibilidadProfesionales() {
 }
 
 // Disponibilidad por defecto para una profesional en una fecha, si no configuró nada:
-// domingo cerrado, resto de días todos los horarios.
+  // domingo cerrado, resto de días todos los horarios.
 function horariosBaseParaFecha(iso) {
   const dow = new Date(iso+'T12:00:00').getDay();
   if (dow === 0) return [];
@@ -643,9 +664,12 @@ function profesionalesParaServicio(serviceName) {
 // Devuelve la lista de horarios disponibles para un servicio en una fecha dada,
 // es decir: la unión de horarios donde AL MENOS UNA profesional capacitada
 // está disponible y no tiene ya un turno ocupado en ese horario.
-function horariosDisponiblesParaServicioYFecha(serviceName, iso) {
-  const profesionales = profesionalesParaServicio(serviceName);
+function horariosDisponiblesParaServicioYFecha(serviceName, iso, profesionalId) {
+  let profesionales = profesionalesParaServicio(serviceName);
+  if (profesionalId) profesionales = profesionales.filter(p => p.id === profesionalId);
   if (profesionales.length === 0) return [];
+
+  // Turnos ya ocupados en esa fecha, agrupados por profesional
   const ocupadosPorProfesional = {};
   TURNOS.filter(t => t.date === iso && t.profesionalId).forEach(t => {
     if (!ocupadosPorProfesional[t.profesionalId]) ocupadosPorProfesional[t.profesionalId] = new Set();
@@ -666,8 +690,9 @@ function horariosDisponiblesParaServicioYFecha(serviceName, iso) {
 
 // Asigna automáticamente una profesional disponible para un servicio, fecha y hora dados.
 // Devuelve { id, nombre } o null si no hay ninguna disponible.
-function asignarProfesional(serviceName, iso, hora) {
-  const profesionales = profesionalesParaServicio(serviceName);
+function asignarProfesional(serviceName, iso, hora, profesionalId) {
+  let profesionales = profesionalesParaServicio(serviceName);
+  if (profesionalId) profesionales = profesionales.filter(p => p.id === profesionalId);
   const ocupadosPorProfesional = {};
   TURNOS.filter(t => t.date === iso && t.profesionalId).forEach(t => {
     if (!ocupadosPorProfesional[t.profesionalId]) ocupadosPorProfesional[t.profesionalId] = new Set();
@@ -708,7 +733,7 @@ function diaCerrado(iso) {
 // ═══════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════
-let state = { step:1, service:null, date:null, hour:null, nombre:'', apellido:'', tel:'', email:'', notas:'' };
+let state = { step:1, service:null, date:null, hour:null, profesionalId:null, nombre:'', apellido:'', tel:'', email:'', notas:'' };
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 
@@ -758,6 +783,7 @@ function goTo(step) {
     else if (i === step) el.classList.add('active');
   }
 
+  if (step === 2) renderProfOptions();
   if (step === 4) fillSummary();
   state.step = step;
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -768,9 +794,36 @@ function goTo(step) {
 // ═══════════════════════════════════════════════
 function selectService(id) {
   state.service = id;
+  state.profesionalId = null;
+  state.date = null;
+  state.hour = null;
   document.querySelectorAll('.service-option').forEach(el => el.classList.remove('selected'));
   document.getElementById(`svc_${id}`).classList.add('selected');
   document.getElementById('nextToStep2').disabled = false;
+  renderProfOptions();
+}
+
+function renderProfOptions() {
+  const svc = SERVICES.find(s => s.id === state.service);
+  if (!svc) return;
+  const profesionales = profesionalesParaServicio(svc.name);
+
+  let html = `<div class="prof-option ${state.profesionalId === null ? 'selected' : ''}" onclick="selectProfesional(null)">Cualquiera disponible</div>`;
+  profesionales.forEach(p => {
+    html += `<div class="prof-option ${state.profesionalId === p.id ? 'selected' : ''}" onclick="selectProfesional('${p.id}')">${p.nombre}</div>`;
+  });
+  document.getElementById('profOptions').innerHTML = html;
+}
+
+function selectProfesional(id) {
+  state.profesionalId = id;
+  state.date = null;
+  state.hour = null;
+  document.getElementById('nextToStep3').disabled = true;
+  document.getElementById('hoursGrid').innerHTML = '';
+  document.getElementById('hoursTitle').textContent = 'Seleccioná primero una fecha';
+  renderProfOptions();
+  renderCalendar();
 }
 
 // ═══════════════════════════════════════════════
@@ -805,7 +858,7 @@ function renderCalendar() {
     const isPast = date < today;
     const iso = date.toISOString().slice(0,10);
     const sinHorarios = serviceName
-      ? horariosDisponiblesParaServicioYFecha(serviceName, iso).length === 0
+    ? horariosDisponiblesParaServicioYFecha(serviceName, iso, state.profesionalId).length === 0
       : diaCerrado(iso);
     const isToday = date.getTime() === today.getTime();
     const isSelected = state.date === iso;
@@ -839,7 +892,7 @@ function renderHours(iso) {
   const serviceName = svc ? svc.name : null;
 
   const horariosDisponibles = serviceName
-    ? horariosDisponiblesParaServicioYFecha(serviceName, iso)
+    ? horariosDisponiblesParaServicioYFecha(serviceName, iso, state.profesionalId)
     : [];
 
   if (horariosDisponibles.length === 0) {
@@ -866,9 +919,7 @@ function selectHour(h) {
 }
 
 // ═══════════════════════════════════════════════
-
-  // Turnos ya ocupados en esa fecha, agrupados por profesional
-  //  STEP 3: DATOS
+//  STEP 3: DATOS
 // ═══════════════════════════════════════════════
 function checkStep3() {
   const n = document.getElementById('inputNombre').value.trim();
@@ -898,6 +949,12 @@ function fillSummary() {
   document.getElementById('sumDuracion').textContent = svc.duration;
   document.getElementById('sumFecha').textContent = fechaStr;
   document.getElementById('sumHora').textContent = state.hour + ' hs';
+  if (state.profesionalId) {
+    const prof = PROFESIONALES.find(p => p.id === state.profesionalId);
+    document.getElementById('sumProfesional').textContent = prof ? prof.nombre : 'A confirmar';
+  } else {
+    document.getElementById('sumProfesional').textContent = 'Cualquiera disponible';
+  }
   document.getElementById('sumNombre').textContent = `${n} ${a}`;
   document.getElementById('sumTel').textContent = t;
 }
@@ -915,7 +972,7 @@ async function confirmarTurno() {
   // Refrescar turnos para minimizar conflictos de asignación
   await cargarTurnos();
 
-  const profesional = asignarProfesional(svc.name, state.date, state.hour);
+  const profesional = asignarProfesional(svc.name, state.date, state.hour, state.profesionalId);
   if (!profesional) {
     btn.disabled = false;
     btn.textContent = originalText;
@@ -969,6 +1026,10 @@ async function confirmarTurno() {
       <div><div class="confirm-row-label">Horario</div><div class="confirm-row-text">${state.hour} hs</div></div>
     </div>
     <div class="confirm-row">
+      <div class="confirm-row-icon">💁</div>
+      <div><div class="confirm-row-label">Profesional</div><div class="confirm-row-text">${profesional.nombre}</div></div>
+    </div>
+    <div class="confirm-row">
       <div class="confirm-row-icon">👤</div>
       <div><div class="confirm-row-label">Nombre</div><div class="confirm-row-text">${state.nombre} ${state.apellido}</div></div>
     </div>
@@ -1001,7 +1062,7 @@ function sendWhatsApp() {
 }
 
 function resetForm() {
-  state = { step:1, service:null, date:null, hour:null, nombre:'', apellido:'', tel:'', email:'', notas:'' };
+  state = { step:1, service:null, date:null, hour:null, profesionalId:null, nombre:'', apellido:'', tel:'', email:'', notas:'' };
   document.getElementById('inputNombre').value='';
   document.getElementById('inputApellido').value='';
   document.getElementById('inputTel').value='';
@@ -1017,7 +1078,7 @@ function resetForm() {
 
 // ═══════════════════════════════════════════════
 //  ADMIN PANEL
-// ═══════════════════════════════════════════════
+  // ═══════════════════════════════════════════════
 const ADMIN_PASSWORD = 'Fernalambu26'; // Change this!
 
 function openAdmin() {
@@ -1078,7 +1139,7 @@ async function renderAdminPanel() {
     const dt = new Date(d+'T12:00:00');
     const label = d === today ? 'Hoy' : `${dt.getDate()} ${months2[dt.getMonth()]}`;
     return `<button class="day-tab ${d===activeDate?'active':''}" onclick="switchAdminDay('${d}', this)">${label}</button>`;
-    }).join('');
+  }).join('');
 
   renderTurnosForDate(activeDate);
 }
