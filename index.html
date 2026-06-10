@@ -194,6 +194,33 @@
     .admin-btn:hover { background: var(--olive-dark); }
     .admin-error { font-size: 12px; color: var(--rose); display: none; }
     .admin-day-tabs { display: flex; gap: 6px; margin-bottom: 1.2rem; flex-wrap: wrap; }
+
+    /* Admin main tabs */
+    .admin-main-tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    .main-tab {
+      background: none; border: none; padding: 10px 4px; font-family: 'Jost', sans-serif;
+      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brown-light);
+      cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; margin-bottom: -1px;
+    }
+    .main-tab.active { color: var(--olive); border-bottom-color: var(--olive); font-weight: 500; }
+    .main-tab:hover:not(.active) { color: var(--brown); }
+
+    /* Disponibilidad editor */
+    .disp-date-picker { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
+    .disp-cerrado-row { margin-bottom: 1.2rem; padding: 0.9rem 1rem; background: var(--cream-mid); border: 1px solid var(--border); border-radius: 8px; }
+    .disp-toggle { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--brown); cursor: pointer; }
+    .disp-toggle input { width: 16px; height: 16px; accent-color: var(--rose); cursor: pointer; }
+    .disp-subtitle { font-size: 12px; color: var(--brown-light); margin-bottom: 0.8rem; }
+    .disp-hours-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .disp-hour-toggle {
+      padding: 10px 6px; text-align: center; border: 1.5px solid var(--border); border-radius: 6px;
+      font-size: 12px; cursor: pointer; transition: all 0.2s; color: var(--brown-light); background: var(--cream-mid);
+user-select: none;
+    }
+    .disp-hour-toggle.enabled { background: var(--olive); border-color: var(--olive); color: #fff; font-weight: 500; }
+    #dispHorariosWrapper.disabled-section { opacity: 0.4; pointer-events: none; }
+    .disp-saved-msg { display: none; font-size: 12px; color: var(--olive); margin-top: 0.8rem; }
+    .disp-saved-msg.show { display: block; }
     .day-tab { padding: 6px 12px; border: 1.5px solid var(--border); border-radius: 4px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; background: none; font-family: 'Jost', sans-serif; color: var(--brown-light); }
     .day-tab.active { background: var(--olive); border-color: var(--olive); color: #fff; }
     .turno-card { background: var(--cream-mid); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 0.7rem; display: flex; gap: 1rem; align-items: flex-start; }
@@ -338,15 +365,15 @@
     <div class="form-grid">
       <div class="form-group">
         <label class="form-label">Nombre *</label>
-        <input type="text" class="form-input" id="inputNombre" placeholder="Tu nombre" oninput="checkStep3()">
+        <input type="text" class="form-input" id="inputNombre" placeholder="Tu nombre" oninput="checkStep3()" onchange="checkStep3()">
       </div>
       <div class="form-group">
         <label class="form-label">Apellido *</label>
-        <input type="text" class="form-input" id="inputApellido" placeholder="Tu apellido" oninput="checkStep3()">
+        <input type="text" class="form-input" id="inputApellido" placeholder="Tu apellido" oninput="checkStep3()" onchange="checkStep3()">
       </div>
       <div class="form-group">
         <label class="form-label">Teléfono / WhatsApp *</label>
-        <input type="tel" class="form-input" id="inputTel" placeholder="+54 9 261 …" oninput="checkStep3()">
+        <input type="tel" class="form-input" id="inputTel" placeholder="+54 9 261 …" oninput="checkStep3()" onchange="checkStep3()">
       </div>
       <div class="form-group">
         <label class="form-label">Email (opcional)</label>
@@ -410,7 +437,7 @@
       <p class="confirm-sub">Tu reserva fue registrada. En breve nos comunicamos por WhatsApp para confirmarte todo.</p>
       <div class="confirm-card" id="confirmCard"></div>
       <button class="whatsapp-btn" onclick="sendWhatsApp()">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.558 4.11 1.528 5.832L0 24l6.335-1.652C8.037 23.39 9.982 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.893 0-3.672-.513-5.207-1.41l-.372-.22-3.867 1.009 1.026-3.751-.243-.385A9.937 9.937 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.558 4.11 1.528 5.832L0 24l6.335-1.652C8.037 23.39 9.982 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.893 0-3.672-.513-5.207-1.41l-.372-.22-3.867 1.009 1.026-3.751-.243-.385A9.937 9.937 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg> 
         Avisar por WhatsApp
       </button>
       <div style="margin-top: 1.5rem;">
@@ -440,9 +467,37 @@
     </div>
 
     <div id="adminContent" style="display:none;">
-      <div class="admin-stats" id="adminStats"></div>
-      <div class="admin-day-tabs" id="adminDayTabs"></div>
-      <div id="adminTurnosList"></div>
+      <div class="admin-main-tabs">
+        <button class="main-tab active" id="mainTabTurnos" onclick="switchMainTab('turnos')">Turnos</button>
+        <button class="main-tab" id="mainTabDisp" onclick="switchMainTab('disponibilidad')">Disponibilidad</button>
+      </div>
+
+      <div id="adminTurnosSection">
+        <div class="admin-stats" id="adminStats"></div>
+        <div class="admin-day-tabs" id="adminDayTabs"></div>
+        <div id="adminTurnosList"></div>
+      </div>
+
+      <div id="adminDispSection" style="display:none;">
+        <div class="disp-date-picker">
+          <label class="form-label">Elegí una fecha para configurar</label>
+          <input type="date" class="form-input" id="dispDateInput" onchange="loadDispForDate()">
+        </div>
+        <div id="dispEditor" style="display:none;">
+          <div class="disp-cerrado-row">
+            <label class="disp-toggle">
+              <input type="checkbox" id="dispCerrado" onchange="toggleDispCerrado()">
+              <span>Marcar este día como cerrado (sin turnos disponibles)</span>
+            </label>
+          </div>
+          <div id="dispHorariosWrapper">
+            <p class="disp-subtitle">Tildá los horarios disponibles para este día:</p>
+            <div class="disp-hours-grid" id="dispHoursGrid"></div>
+          </div>
+          <button class="admin-btn" onclick="guardarDisponibilidad()" style="margin-top:1.2rem;">Guardar disponibilidad</button>
+          <p class="disp-saved-msg" id="dispSavedMsg">✓ Guardado</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -484,6 +539,9 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // Storage for turnos (cargado desde Supabase)
 let TURNOS = [];
 
+// Cache de disponibilidad por fecha: { 'YYYY-MM-DD': { horarios: [...], cerrado: bool } }
+let DISPONIBILIDAD = {};
+
 async function cargarTurnos() {
   const { data, error } = await sb.from('turnos').select('*');
   if (error) {
@@ -506,6 +564,39 @@ async function cargarTurnos() {
   }));
 }
 
+async function cargarDisponibilidad() {
+  const { data, error } = await sb.from('disponibilidad').select('*');
+  if (error) {
+    console.error('Error cargando disponibilidad:', error);
+    return;
+  }
+  DISPONIBILIDAD = {};
+  (data || []).forEach(d => {
+    DISPONIBILIDAD[d.fecha] = { horarios: d.horarios || [], cerrado: !!d.cerrado };
+  });
+}
+
+// Devuelve la lista de horarios habilitados para una fecha dada,
+// considerando configuración manual o el comportamiento por defecto.
+function horariosDisponiblesParaFecha(iso) {
+  const config = DISPONIBILIDAD[iso];
+  if (config) {
+    if (config.cerrado) return [];
+    return config.horarios && config.horarios.length ? config.horarios : HORARIOS;
+  }
+  // Por defecto: domingo cerrado, resto de días todos los horarios
+  const dow = new Date(iso+'T12:00:00').getDay();
+  if (dow === 0) return [];
+  return HORARIOS;
+}
+
+function diaCerrado(iso) {
+  const config = DISPONIBILIDAD[iso];
+  if (config) return config.cerrado;
+  const dow = new Date(iso+'T12:00:00').getDay();
+  return dow === 0;
+}
+
 // ═══════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════
@@ -518,7 +609,7 @@ let calMonth = new Date().getMonth();
 // ═══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
   renderServices();
-  await cargarTurnos();
+  await Promise.all([cargarTurnos(), cargarDisponibilidad()]);
   renderCalendar();
 });
 
@@ -541,12 +632,13 @@ function goTo(step) {
   // Validate
   if (step === 2 && !state.service) return;
   if (step === 3 && (!state.date || !state.hour)) return;
-if (step === 4) {
+  if (step === 4) {
     const n = document.getElementById('inputNombre').value.trim();
     const a = document.getElementById('inputApellido').value.trim();
     const t = document.getElementById('inputTel').value.trim();
     if (!n || !a || !t) return;
   }
+
   document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
   document.getElementById(`panel${step}`).classList.add('active');
 
@@ -566,7 +658,7 @@ if (step === 4) {
 // ═══════════════════════════════════════════════
 //  STEP 1: SERVICE
 // ═══════════════════════════════════════════════
-function selectService(id) {
+  function selectService(id) {
   state.service = id;
   document.querySelectorAll('.service-option').forEach(el => el.classList.remove('selected'));
   document.getElementById(`svc_${id}`).classList.add('selected');
@@ -599,17 +691,16 @@ function renderCalendar() {
   for (let i=0; i<firstDay; i++) html += `<div class="cal-cell empty"></div>`;
   for (let d=1; d<=daysInMonth; d++) {
     const date = new Date(calYear, calMonth, d);
-    const dow = date.getDay(); // 0=Dom
     const isPast = date < today;
-    const isSun = dow === 0;
-    const isToday = date.getTime() === today.getTime();
     const iso = date.toISOString().slice(0,10);
+    const cerrado = diaCerrado(iso);
+    const isToday = date.getTime() === today.getTime();
     const isSelected = state.date === iso;
     const cls = ['cal-cell'];
-    if (isPast || isSun) cls.push('disabled');
+    if (isPast || cerrado) cls.push('disabled');
     else if (isSelected) cls.push('selected');
     else if (isToday) cls.push('today');
-    const click = (isPast || isSun) ? '' : `onclick="selectDate('${iso}')"`;
+    const click = (isPast || cerrado) ? '' : `onclick="selectDate('${iso}')"`;
     html += `<div class="${cls.join(' ')}" ${click}>${d}</div>`;
   }
   document.getElementById('calGrid').innerHTML = html;
@@ -621,7 +712,7 @@ async function selectDate(iso) {
   renderCalendar();
   document.getElementById('hoursTitle').textContent = 'Cargando horarios…';
   document.getElementById('hoursGrid').innerHTML = '';
-  await cargarTurnos();
+  await Promise.all([cargarTurnos(), cargarDisponibilidad()]);
   renderHours(iso);
 }
 
@@ -631,12 +722,19 @@ function renderHours(iso) {
   const months2 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   document.getElementById('hoursTitle').textContent = `${days[date.getDay()]} ${date.getDate()} de ${months2[date.getMonth()]}`;
 
+  const horariosHabilitados = new Set(horariosDisponiblesParaFecha(iso));
+
+  if (horariosHabilitados.size === 0) {
+    document.getElementById('hoursGrid').innerHTML = `<div class="turno-empty" style="grid-column:1/-1;">No hay horarios disponibles para este día.</div>`;
+    return;
+  }
+
   // Merge demo taken + stored turnos for this date
   const taken = new Set(TAKEN_DEMO);
   TURNOS.filter(t => t.date === iso).forEach(t => taken.add(`${iso}_${t.hour}`));
 
   let html = '';
-  HORARIOS.forEach(h => {
+  HORARIOS.filter(h => horariosHabilitados.has(h)).forEach(h => {
     const key = `${iso}_${h}`;
     const isTaken = taken.has(key);
     const isSelected = state.hour === h;
@@ -881,6 +979,108 @@ function renderTurnosForDate(date) {
     </div>
   `).join('');
 }
+
+// ═══════════════════════════════════════════════
+//  ADMIN: TABS PRINCIPALES
+// ═══════════════════════════════════════════════
+function switchMainTab(tab) {
+  const isTurnos = tab === 'turnos';
+  document.getElementById('mainTabTurnos').classList.toggle('active', isTurnos);
+  document.getElementById('mainTabDisp').classList.toggle('active', !isTurnos);
+  document.getElementById('adminTurnosSection').style.display = isTurnos ? 'block' : 'none';
+  document.getElementById('adminDispSection').style.display = isTurnos ? 'none' : 'block';
+
+  if (!isTurnos) {
+    // Al entrar a Disponibilidad, preseleccionar hoy si no hay fecha elegida
+    const input = document.getElementById('dispDateInput');
+    if (!input.value) {
+      input.value = new Date().toISOString().slice(0,10);
+      loadDispForDate();
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  ADMIN: DISPONIBILIDAD
+// ═══════════════════════════════════════════════
+async function loadDispForDate() {
+  const iso = document.getElementById('dispDateInput').value;
+  if (!iso) return;
+
+  document.getElementById('dispEditor').style.display = 'block';
+  document.getElementById('dispSavedMsg').classList.remove('show');
+
+  await cargarDisponibilidad();
+
+  const config = DISPONIBILIDAD[iso];
+  const dow = new Date(iso+'T12:00:00').getDay();
+  const cerradoPorDefecto = dow === 0;
+
+  const cerrado = config ? config.cerrado : cerradoPorDefecto;
+  const horariosActivos = new Set(
+    config
+      ? (config.cerrado ? [] : (config.horarios && config.horarios.length ? config.horarios : HORARIOS))
+      : (cerradoPorDefecto ? [] : HORARIOS)
+  );
+
+  document.getElementById('dispCerrado').checked = cerrado;
+  renderDispHoursGrid(horariosActivos);
+  document.getElementById('dispHorariosWrapper').classList.toggle('disabled-section', cerrado);
+}
+
+function renderDispHoursGrid(horariosActivos) {
+  const grid = document.getElementById('dispHoursGrid');
+  grid.innerHTML = HORARIOS.map(h => {
+    const enabled = horariosActivos.has(h);
+    return `<div class="disp-hour-toggle ${enabled ? 'enabled' : ''}" onclick="toggleDispHour(this)" data-hour="${h}">${h}</div>`;
+  }).join('');
+}
+
+function toggleDispHour(el) {
+  el.classList.toggle('enabled');
+}
+
+function toggleDispCerrado() {
+  const cerrado = document.getElementById('dispCerrado').checked;
+  document.getElementById('dispHorariosWrapper').classList.toggle('disabled-section', cerrado);
+}
+
+async function guardarDisponibilidad() {
+  const iso = document.getElementById('dispDateInput').value;
+  if (!iso) return;
+
+  const cerrado = document.getElementById('dispCerrado').checked;
+  const horarios = cerrado
+    ? []
+    : Array.from(document.querySelectorAll('.disp-hour-toggle.enabled')).map(el => el.dataset.hour);
+
+  const btn = document.querySelector('#dispEditor .admin-btn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+
+  const { error } = await sb.from('disponibilidad').upsert({
+    fecha: iso,
+    horarios: horarios,
+    cerrado: cerrado
+  });
+
+  btn.disabled = false;
+  btn.textContent = originalText;
+
+  if (error) {
+    console.error('Error guardando disponibilidad:', error);
+    alert('Hubo un problema al guardar la disponibilidad. Intentá de nuevo.');
+    return;
+  }
+
+  await cargarDisponibilidad();
+
+  const msg = document.getElementById('dispSavedMsg');
+  msg.classList.add('show');
+  setTimeout(() => msg.classList.remove('show'), 2500);
+}
+
 </script>
 </body>
 </html>
