@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alambú · Reservar Turno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    :root {
+      --gold: #B8924A; --gold-light: #D4AA6A; --olive: #6B7C5C; --olive-dark: #4A5A3C;
+      --olive-light: #8A9E76; --rose: #C9937A; --rose-light: #E8C4B4;
+      --cream: #F9F5F0; --cream-mid: #F2EBE1; --cream-dark: #E8DECE;
+      --brown: #3A3228; --brown-light: #7A6A5A; --border: #DDD0C0;
+    }
+    body { font-family: 'Jost', sans-serif; color: var(--brown); background: var(--cream); min-height: 100vh; }
+
+    /* ── NAV ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 3rem; background: var(--cream); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-brand-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--olive); letter-spacing: 0.12em; line-height: 1; }
+    .nav-brand-sub { font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brown-light); margin-top: 3px; }
+    .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-right a { font-size: 11.5px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brown); text-decoration: none; transition: color 0.2s; }
+    .nav-right a:hover { color: var(--olive); }
+    .btn-admin { padding: 8px 16px; border: 1.5px solid var(--border); border-radius: 4px; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; background: transparent; color: var(--brown-light); font-family: 'Jost', sans-serif; transition: all 0.2s; }
+    .btn-admin:hover { border-color: var(--olive); color: var(--olive); }
+
+    /* ── MAIN LAYOUT ── */
+    .page-header { text-align: center; padding: 3.5rem 2rem 2rem; background: var(--cream-mid); border-bottom: 1px solid var(--border); }
+    .page-eyebrow { font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-size: 46px; font-weight: 400; color: var(--brown); line-height: 1.1; }
+    .page-title em { font-style: italic; color: var(--rose); }
+    .page-divider { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 1rem auto; }
+    .page-divider-line { width: 50px; height: 1px; background: var(--gold); }
+    .page-divider-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; }
+    .page-subtitle { font-size: 14px; color: var(--brown-light); margin-bottom: 0.5rem; }
+
+    /* ── STEPPER ── */
+    .stepper { display: flex; align-items: center; justify-content: center; gap: 0; padding: 1.5rem 2rem; background: var(--cream); border-bottom: 1px solid var(--border); }
+    .step { display: flex; align-items: center; gap: 10px; }
+    .step-num {
+      width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 500; color: var(--brown-light); transition: all 0.3s;
+    }
+    .step-label { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brown-light); transition: color 0.3s; white-space: nowrap; }
+    .step.active .step-num { background: var(--olive); border-color: var(--olive); color: #fff; }
+    .step.active .step-label { color: var(--olive); font-weight: 500; }
+    .step.done .step-num { background: var(--gold); border-color: var(--gold); color: #fff; }
+    .step.done .step-label { color: var(--gold); }
+    .step-line { width: 40px; height: 1px; background: var(--border); margin: 0 6px; }
+    @media (max-width: 600px) { .step-label { display: none; } .step-line { width: 20px; } }
+
+    /* ── BOOKING FORM ── */
+    .booking-wrapper { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+    /* STEP PANELS */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+
+    /* ── STEP 1: SERVICIO ── */
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+    .service-option {
+      background: var(--cream-mid); border: 2px solid var(--border); border-radius: 8px;
+      padding: 1.5rem; cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .service-option:hover { border-color: var(--olive-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(58,50,40,0.07); }
+    .service-option.selected { border-color: var(--olive); background: rgba(107,124,92,0.06); }
+    .service-option.selected::after {
+      content: '✓'; position: absolute; top: 10px; right: 12px;
+      width: 22px; height: 22px; background: var(--olive); color: #fff;
+      border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center;
+      font-weight: 600;
+    }
+    .service-icon { font-size: 28px; margin-bottom: 0.7rem; }
+    .service-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; color: var(--brown); margin-bottom: 0.3rem; }
+    .service-duration { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .service-desc-small { font-size: 11.5px; color: var(--brown-light); line-height: 1.5; }
+
+    /* ── STEP 2: CALENDARIO ── */
+    .calendar-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem; }
+    @media (max-width: 700px) { .calendar-layout { grid-template-columns: 1fr; } }
+
+    .calendar-box { background: var(--cream-mid); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+    .cal-month { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; color: var(--brown); }
+    .cal-nav { background: none; border: 1px solid var(--border); border-radius: 4px; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--brown-light); font-size: 14px; transition: all 0.2s; }
+    .cal-nav:hover { border-color: var(--olive); color: var(--olive); }
+    .cal-days-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 0.4rem; }
+    .cal-day-name { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brown-light); padding: 4px 0; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .cal-cell {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; border-radius: 50%; cursor: pointer; transition: all 0.2s; color: var(--brown);
+    }
+    .cal-cell:hover:not(.disabled):not(.empty) { background: var(--cream-dark); }
+    .cal-cell.today { font-weight: 600; color: var(--olive); }
+    .cal-cell.selected { background: var(--olive); color: #fff; font-weight: 500; }
+    .cal-cell.disabled { color: var(--border); cursor: not-allowed; }
+    .cal-cell.empty { cursor: default; }
+
+    .hours-box { background: var(--cream-mid); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+    .hours-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; margin-bottom: 1rem; color: var(--brown); }
+    .hours-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .hour-slot {
+      padding: 10px 6px; text-align: center; border: 1.5px solid var(--border); border-radius: 6px;
+      font-size: 12px; cursor: pointer; transition: all 0.2s; color: var(--brown);
+    }
+    .hour-slot:hover:not(.taken) { border-color: var(--olive-light); background: rgba(107,124,92,0.06); }
+    .hour-slot.selected { background: var(--olive); border-color: var(--olive); color: #fff; font-weight: 500; }
+    .hour-slot.taken { background: var(--cream-dark); color: var(--border); cursor: not-allowed; text-decoration: line-through; }
+
+    /* ── STEP 3: DATOS ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brown-light); }
+    .form-input {
+      padding: 12px 14px; background: var(--cream-mid); border: 1.5px solid var(--border); border-radius: 6px;
+      font-family: 'Jost', sans-serif; font-size: 13px; color: var(--brown); outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: var(--olive); }
+    .form-input::placeholder { color: var(--border); }
+    textarea.form-input { resize: vertical; min-height: 80px; }
+
+    /* ── RESUMEN ── */
+    .summary-box { background: var(--cream-mid); border: 1px solid var(--border); border-radius: 10px; padding: 2rem; margin-top: 1.5rem; }
+    .summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-key { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brown-light); }
+    .summary-val { font-size: 14px; color: var(--brown); font-weight: 500; text-align: right; max-width: 60%; }
+    .summary-note { font-size: 12px; color: var(--brown-light); margin-top: 1.2rem; line-height: 1.6; }
+
+    /* ── CONFIRMACION ── */
+    .confirm-screen { text-align: center; padding: 3rem 2rem; animation: fadeIn 0.5s ease; }
+    .confirm-icon { font-size: 64px; margin-bottom: 1rem; }
+    .confirm-title { font-family: 'Cormorant Garamond', serif; font-size: 38px; color: var(--olive); margin-bottom: 0.5rem; }
+    .confirm-title em { font-style: italic; color: var(--rose); }
+    .confirm-sub { font-size: 14px; color: var(--brown-light); line-height: 1.7; max-width: 420px; margin: 0 auto 2rem; }
+    .confirm-card { background: var(--cream-mid); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 2rem; max-width: 420px; margin: 0 auto 2rem; text-align: left; }
+    .confirm-row { display: flex; align-items: flex-start; gap: 10px; padding: 0.5rem 0; }
+    .confirm-row-icon { font-size: 16px; margin-top: 1px; }
+    .confirm-row-text { font-size: 13px; color: var(--brown); line-height: 1.5; }
+    .confirm-row-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--brown-light); }
+    .whatsapp-btn {
+      display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px;
+      background: #25D366; color: #fff; border-radius: 6px; font-size: 12px;
+      letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; font-family: 'Jost', sans-serif;
+      transition: background 0.2s; cursor: pointer; border: none;
+    }
+    .whatsapp-btn:hover { background: #1EBE58; }
+
+    /* ── NAVIGATION BUTTONS ── */
+    .nav-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .btn-back { background: none; border: 1.5px solid var(--border); border-radius: 4px; padding: 11px 22px; font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brown-light); cursor: pointer; transition: all 0.2s; }
+    .btn-back:hover { border-color: var(--brown); color: var(--brown); }
+    .btn-next { background: var(--olive); border: none; border-radius: 4px; padding: 12px 28px; font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #fff; cursor: pointer; transition: background 0.2s; }
+    .btn-next:hover { background: var(--olive-dark); }
+    .btn-next:disabled { background: var(--border); cursor: not-allowed; }
+    .btn-confirm { background: var(--gold); border: none; border-radius: 4px; padding: 13px 32px; font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; cursor: pointer; transition: background 0.2s; }
+    .btn-confirm:hover { background: var(--gold-light); }
+
+    /* ── STEP TITLES ── */
+    .step-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--brown); margin-bottom: 0.3rem; }
+    .step-subtitle { font-size: 13px; color: var(--brown-light); }
+
+    /* ── ADMIN PANEL ── */
+    .admin-overlay { display: none; position: fixed; inset: 0; background: rgba(58,50,40,0.55); z-index: 200; align-items: flex-start; justify-content: flex-end; }
+    .admin-overlay.open { display: flex; }
+    .admin-drawer {
+      background: var(--cream); width: min(480px, 100vw); height: 100vh; overflow-y: auto;
+      padding: 2rem; box-shadow: -8px 0 32px rgba(0,0,0,0.15); animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+    .admin-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--brown); }
+    .admin-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--brown-light); padding: 4px; }
+    .admin-subtitle { font-size: 12px; color: var(--brown-light); margin-bottom: 1.5rem; }
+    .admin-login { display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem; background: var(--cream-mid); border: 1px solid var(--border); border-radius: 8px; }
+    .admin-login label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brown-light); }
+    .admin-btn { background: var(--olive); border: none; border-radius: 4px; padding: 11px; font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #fff; cursor: pointer; transition: background 0.2s; }
+    .admin-btn:hover { background: var(--olive-dark); }
+    .admin-error { font-size: 12px; color: var(--rose); display: none; }
+    .admin-day-tabs { display: flex; gap: 6px; margin-bottom: 1.2rem; flex-wrap: wrap; }
+    .day-tab { padding: 6px 12px; border: 1.5px solid var(--border); border-radius: 4px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; background: none; font-family: 'Jost', sans-serif; color: var(--brown-light); }
+    .day-tab.active { background: var(--olive); border-color: var(--olive); color: #fff; }
+    .turno-card { background: var(--cream-mid); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 0.7rem; display: flex; gap: 1rem; align-items: flex-start; }
+    .turno-hora { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--olive); line-height: 1; min-width: 50px; }
+    .turno-info { flex: 1; }
+    .turno-name { font-size: 13px; font-weight: 500; color: var(--brown); }
+    .turno-service { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; }
+    .turno-phone { font-size: 11px; color: var(--brown-light); margin-top: 2px; }
+    .turno-notes { font-size: 11px; color: var(--brown-light); font-style: italic; margin-top: 3px; }
+    .turno-empty { text-align: center; padding: 2.5rem; color: var(--brown-light); font-size: 13px; }
+    .turno-badge { font-size: 9px; background: var(--olive-light); color: #fff; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.08em; text-transform: uppercase; align-self: flex-start; margin-top: 2px; }
+    .admin-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .stat-box { background: var(--cream-mid); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; }
+    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--olive); line-height: 1; }
+    .stat-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brown-light); margin-top: 2px; }
+
+    /* ── WA FLOAT ── */
+    .wa-float {
+      position: fixed; bottom: 24px; right: 24px; z-index: 90;
+      width: 52px; height: 52px; background: #25D366; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(37,211,102,0.4); text-decoration: none; transition: transform 0.2s;
+    }
+    .wa-float:hover { transform: scale(1.08); }
+    .wa-float svg { width: 26px; height: 26px; fill: #fff; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav { padding: 0.9rem 1.2rem; }
+      .booking-wrapper { padding: 1.5rem 1rem 3rem; }
+      .page-header { padding: 2.5rem 1.2rem 1.5rem; }
+      .page-title { font-size: 34px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">
+    <div>
+      <div class="nav-brand-name">ALAMBÚ</div>
+      <div style="font-size:8.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--brown-light);margin-top:3px;">Belleza y bienestar para volver a vos</div>
+    </div>
+  </a>
+  <div class="nav-right">
+    <a href="https://wa.me/5492615371450" target="_blank" rel="noopener">Contacto</a>
+    <button class="btn-admin" onclick="openAdmin()">Panel Admin</button>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <p class="page-eyebrow">Tu espacio de bienestar</p>
+  <h1 class="page-title">Reservar <em>turno</em></h1>
+  <div class="page-divider">
+    <span class="page-divider-line"></span>
+    <span class="page-divider-dot"></span>
+    <span class="page-divider-line"></span>
+  </div>
+  <p class="page-subtitle">Elegí tu servicio, fecha y horario en pocos pasos</p>
+</div>
+
+<!-- STEPPER -->
+<div class="stepper">
+  <div class="step active" id="s1">
+    <div class="step-num">1</div>
+    <div class="step-label">Servicio</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step" id="s2">
+    <div class="step-num">2</div>
+    <div class="step-label">Fecha y hora</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step" id="s3">
+    <div class="step-num">3</div>
+    <div class="step-label">Tus datos</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step" id="s4">
+    <div class="step-num">4</div>
+    <div class="step-label">Confirmar</div>
+  </div>
+</div>
+
+<!-- BOOKING WRAPPER -->
+<div class="booking-wrapper">
+
+  <!-- STEP 1: ELEGIR SERVICIO -->
+  <div class="step-panel active" id="panel1">
+    <div class="step-title">¿Qué servicio buscás?</div>
+    <p class="step-subtitle">Seleccioná uno de nuestros tratamientos</p>
+    <div class="services-grid" id="servicesGrid"></div>
+    <div class="nav-buttons">
+      <span></span>
+      <button class="btn-next" id="nextToStep2" disabled onclick="goTo(2)">Elegir fecha →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: FECHA Y HORA -->
+  <div class="step-panel" id="panel2">
+    <div class="step-title">Elegí fecha y horario</div>
+    <p class="step-subtitle">Atendemos de lunes a sábado de 9:30 a 20:00 hs</p>
+    <div class="calendar-layout">
+      <div>
+        <div class="calendar-box">
+          <div class="cal-header">
+            <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+            <div class="cal-month" id="calMonthLabel"></div>
+            <button class="cal-nav" onclick="changeMonth(1)">›</button>
+          </div>
+          <div class="cal-days-header">
+            <div class="cal-day-name">Do</div>
+            <div class="cal-day-name">Lu</div>
+            <div class="cal-day-name">Ma</div>
+            <div class="cal-day-name">Mi</div>
+            <div class="cal-day-name">Ju</div>
+            <div class="cal-day-name">Vi</div>
+            <div class="cal-day-name">Sa</div>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+      </div>
+      <div>
+        <div class="hours-box">
+          <div class="hours-title" id="hoursTitle">Seleccioná primero una fecha</div>
+          <div class="hours-grid" id="hoursGrid"></div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn-back" onclick="goTo(1)">← Volver</button>
+      <button class="btn-next" id="nextToStep3" disabled onclick="goTo(3)">Mis datos →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: DATOS PERSONALES -->
+  <div class="step-panel" id="panel3">
+    <div class="step-title">Tus datos</div>
+    <p class="step-subtitle">Para confirmar tu turno necesitamos un poco más de info</p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Nombre *</label>
+        <input type="text" class="form-input" id="inputNombre" placeholder="Tu nombre" oninput="checkStep3()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Apellido *</label>
+        <input type="text" class="form-input" id="inputApellido" placeholder="Tu apellido" oninput="checkStep3()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Teléfono / WhatsApp *</label>
+        <input type="tel" class="form-input" id="inputTel" placeholder="+54 9 261 …" oninput="checkStep3()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email (opcional)</label>
+        <input type="email" class="form-input" id="inputEmail" placeholder="tu@email.com">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Notas o consultas (opcional)</label>
+        <textarea class="form-input" id="inputNotas" placeholder="¿Alguna consulta especial sobre el servicio?"></textarea>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn-back" onclick="goTo(2)">← Volver</button>
+      <button class="btn-next" id="nextToStep4" disabled onclick="goTo(4)">Ver resumen →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: CONFIRMAR -->
+  <div class="step-panel" id="panel4">
+    <div class="step-title">Confirmá tu turno</div>
+    <p class="step-subtitle">Revisá los datos antes de reservar</p>
+    <div class="summary-box">
+      <div class="summary-row">
+        <span class="summary-key">Servicio</span>
+        <span class="summary-val" id="sumServicio">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Duración estimada</span>
+        <span class="summary-val" id="sumDuracion">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Fecha</span>
+        <span class="summary-val" id="sumFecha">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Horario</span>
+        <span class="summary-val" id="sumHora">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Nombre</span>
+        <span class="summary-val" id="sumNombre">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Teléfono</span>
+        <span class="summary-val" id="sumTel">—</span>
+      </div>
+    </div>
+    <p class="summary-note">
+      ✦ Al confirmar, te enviaremos los detalles por WhatsApp. Recordá cancelar con al menos 24 hs de anticipación.
+    </p>
+    <div class="nav-buttons">
+      <button class="btn-back" onclick="goTo(3)">← Volver</button>
+      <button class="btn-confirm" onclick="confirmarTurno()">Confirmar turno ✓</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: CONFIRMADO -->
+  <div class="step-panel" id="panel5">
+    <div class="confirm-screen">
+      <div class="confirm-icon">🌿</div>
+      <h2 class="confirm-title">¡Turno <em>reservado</em>!</h2>
+      <p class="confirm-sub">Tu reserva fue registrada. En breve nos comunicamos por WhatsApp para confirmarte todo.</p>
+      <div class="confirm-card" id="confirmCard"></div>
+      <button class="whatsapp-btn" onclick="sendWhatsApp()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.558 4.11 1.528 5.832L0 24l6.335-1.652C8.037 23.39 9.982 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.893 0-3.672-.513-5.207-1.41l-.372-.22-3.867 1.009 1.026-3.751-.243-.385A9.937 9.937 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Avisar por WhatsApp
+      </button>
+      <div style="margin-top: 1.5rem;">
+        <button class="btn-back" onclick="resetForm()">Reservar otro turno</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /booking-wrapper -->
+
+<!-- ADMIN PANEL -->
+<div class="admin-overlay" id="adminOverlay" onclick="closeAdminOutside(event)">
+  <div class="admin-drawer" id="adminDrawer">
+    <div class="admin-header">
+      <div class="admin-title">Panel Alambú</div>
+      <button class="admin-close" onclick="closeAdmin()">✕</button>
+    </div>
+    <p class="admin-subtitle">Turnos agendados</p>
+
+    <div id="adminLoginSection">
+      <div class="admin-login">
+        <label>Contraseña</label>
+        <input type="password" class="form-input" id="adminPass" placeholder="••••••" onkeydown="if(event.key==='Enter')adminLogin()">
+        <p class="admin-error" id="adminError">Contraseña incorrecta</p>
+        <button class="admin-btn" onclick="adminLogin()">Ingresar</button>
+      </div>
+    </div>
+
+    <div id="adminContent" style="display:none;">
+      <div class="admin-stats" id="adminStats"></div>
+      <div class="admin-day-tabs" id="adminDayTabs"></div>
+      <div id="adminTurnosList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- WA FLOAT -->
+<a href="https://wa.me/5492615371450" target="_blank" rel="noopener" class="wa-float" title="Escribinos por WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.558 4.11 1.528 5.832L0 24l6.335-1.652C8.037 23.39 9.982 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.893 0-3.672-.513-5.207-1.41l-.372-.22-3.867 1.009 1.026-3.751-.243-.385A9.937 9.937 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+</a>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+const SERVICES = [
+  { id: 1, icon: '👁️', name: 'Extensión de pestañas', duration: '90–120 min', desc: 'Clásica, volumen y mega volumen con materiales premium.' },
+  { id: 2, icon: '✨', name: 'Diseño de cejas', duration: '45–60 min', desc: 'Perfilado, henna y microblading para cejas definidas.' },
+  { id: 3, icon: '🌿', name: 'Tratamiento facial', duration: '60–90 min', desc: 'Limpieza, hidratación y rituales de luminosidad.' },
+  { id: 4, icon: '💆', name: 'Masajes relajantes', duration: '60 min', desc: 'Equilibrá cuerpo y mente con un paréntesis de paz.' },
+  { id: 5, icon: '🌸', name: 'Rituales de bienestar', duration: '75–90 min', desc: 'Experiencias integrales para reconectarte.' },
+  { id: 6, icon: '💅', name: 'Manicuría y pedicuría', duration: '60 min', desc: 'Cuidado completo para tus manos y pies.' },
+];
+
+const HORARIOS = ['09:30','10:00','10:30','11:00','11:30','12:00','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30'];
+
+// Simulated taken slots (key = "YYYY-MM-DD_HH:MM")
+const TAKEN_DEMO = new Set();
+// Pre-fill some demo taken slots
+const demoDate = new Date(); demoDate.setDate(demoDate.getDate()+1);
+const dd = demoDate.toISOString().slice(0,10);
+['10:00','14:30','17:00'].forEach(h => TAKEN_DEMO.add(`${dd}_${h}`));
+
+// ═══════════════════════════════════════════════
+//  SUPABASE
+// ═══════════════════════════════════════════════
+const SUPABASE_URL = 'https://enbiwgxdtimisgnjjmch.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_iQh_3Ojf_ULpAfub3tXeDA_qh8yMX0q';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Storage for turnos (cargado desde Supabase)
+let TURNOS = [];
+
+async function cargarTurnos() {
+  const { data, error } = await supabase.from('turnos').select('*');
+  if (error) {
+    console.error('Error cargando turnos:', error);
+    return;
+  }
+  // Adaptar nombres de columnas (snake_case en DB) al formato usado en la app
+  TURNOS = (data || []).map(t => ({
+    id: t.id,
+    service: t.servicio,
+    duration: t.duracion,
+    date: t.fecha,
+    hour: t.hora,
+    nombre: t.nombre,
+    apellido: t.apellido,
+    tel: t.telefono,
+    email: t.email,
+    notas: t.notas,
+    createdAt: t.created_at
+  }));
+}
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let state = { step:1, service:null, date:null, hour:null, nombre:'', apellido:'', tel:'', email:'', notas:'' };
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  renderServices();
+  await cargarTurnos();
+  renderCalendar();
+});
+
+function renderServices() {
+  const g = document.getElementById('servicesGrid');
+  g.innerHTML = SERVICES.map(s => `
+    <div class="service-option" id="svc_${s.id}" onclick="selectService(${s.id})">
+      <div class="service-icon">${s.icon}</div>
+      <div class="service-name">${s.name}</div>
+      <div class="service-duration">${s.duration}</div>
+      <div class="service-desc-small">${s.desc}</div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  STEP NAVIGATION
+// ═══════════════════════════════════════════════
+function goTo(step) {
+  // Validate
+  if (step === 2 && !state.service) return;
+  if (step === 3 && (!state.date || !state.hour)) return;
+  if (step === 4 && (!state.nombre || !state.apellido || !state.tel)) return;
+
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel${step}`).classList.add('active');
+
+  // Update stepper
+  for (let i=1; i<=4; i++) {
+    const el = document.getElementById(`s${i}`);
+    el.classList.remove('active','done');
+    if (i < step) el.classList.add('done');
+    else if (i === step) el.classList.add('active');
+  }
+
+  if (step === 4) fillSummary();
+  state.step = step;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════
+//  STEP 1: SERVICE
+// ═══════════════════════════════════════════════
+function selectService(id) {
+  state.service = id;
+  document.querySelectorAll('.service-option').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`svc_${id}`).classList.add('selected');
+  document.getElementById('nextToStep2').disabled = false;
+}
+
+// ═══════════════════════════════════════════════
+//  STEP 2: CALENDAR
+// ═══════════════════════════════════════════════
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  state.date = null; state.hour = null;
+  document.getElementById('nextToStep3').disabled = true;
+  document.getElementById('hoursGrid').innerHTML = '';
+  document.getElementById('hoursTitle').textContent = 'Seleccioná primero una fecha';
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('calMonthLabel').textContent = `${months[calMonth]} ${calYear}`;
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+
+  let html = '';
+  for (let i=0; i<firstDay; i++) html += `<div class="cal-cell empty"></div>`;
+  for (let d=1; d<=daysInMonth; d++) {
+    const date = new Date(calYear, calMonth, d);
+    const dow = date.getDay(); // 0=Dom
+    const isPast = date < today;
+    const isSun = dow === 0;
+    const isToday = date.getTime() === today.getTime();
+    const iso = date.toISOString().slice(0,10);
+    const isSelected = state.date === iso;
+    const cls = ['cal-cell'];
+    if (isPast || isSun) cls.push('disabled');
+    else if (isSelected) cls.push('selected');
+    else if (isToday) cls.push('today');
+    const click = (isPast || isSun) ? '' : `onclick="selectDate('${iso}')"`;
+    html += `<div class="${cls.join(' ')}" ${click}>${d}</div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+async function selectDate(iso) {
+  state.date = iso; state.hour = null;
+  document.getElementById('nextToStep3').disabled = true;
+  renderCalendar();
+  document.getElementById('hoursTitle').textContent = 'Cargando horarios…';
+  document.getElementById('hoursGrid').innerHTML = '';
+  await cargarTurnos();
+  renderHours(iso);
+}
+
+function renderHours(iso) {
+  const date = new Date(iso+'T12:00:00');
+  const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months2 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('hoursTitle').textContent = `${days[date.getDay()]} ${date.getDate()} de ${months2[date.getMonth()]}`;
+
+  // Merge demo taken + stored turnos for this date
+  const taken = new Set(TAKEN_DEMO);
+  TURNOS.filter(t => t.date === iso).forEach(t => taken.add(`${iso}_${t.hour}`));
+
+  let html = '';
+  HORARIOS.forEach(h => {
+    const key = `${iso}_${h}`;
+    const isTaken = taken.has(key);
+    const isSelected = state.hour === h;
+    const cls = ['hour-slot'];
+    if (isTaken) cls.push('taken');
+    else if (isSelected) cls.push('selected');
+    const click = isTaken ? '' : `onclick="selectHour('${h}')"`;
+    html += `<div class="${cls.join(' ')}" ${click}>${h}</div>`;
+  });
+  document.getElementById('hoursGrid').innerHTML = html;
+}
+
+function selectHour(h) {
+  state.hour = h;
+  document.getElementById('nextToStep3').disabled = false;
+  renderHours(state.date);
+}
+
+// ═══════════════════════════════════════════════
+//  STEP 3: DATOS
+// ═══════════════════════════════════════════════
+function checkStep3() {
+  const n = document.getElementById('inputNombre').value.trim();
+  const a = document.getElementById('inputApellido').value.trim();
+  const t = document.getElementById('inputTel').value.trim();
+  document.getElementById('nextToStep4').disabled = !(n && a && t);
+}
+
+// ═══════════════════════════════════════════════
+//  STEP 4: SUMMARY
+// ═══════════════════════════════════════════════
+function fillSummary() {
+  const svc = SERVICES.find(s => s.id === state.service);
+  const n = document.getElementById('inputNombre').value.trim();
+  const a = document.getElementById('inputApellido').value.trim();
+  const t = document.getElementById('inputTel').value.trim();
+  state.nombre = n; state.apellido = a; state.tel = t;
+  state.email = document.getElementById('inputEmail').value.trim();
+  state.notas = document.getElementById('inputNotas').value.trim();
+
+  const date = new Date(state.date+'T12:00:00');
+  const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months2 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaStr = `${days[date.getDay()]} ${date.getDate()} de ${months2[date.getMonth()]} de ${date.getFullYear()}`;
+
+  document.getElementById('sumServicio').textContent = svc.name;
+  document.getElementById('sumDuracion').textContent = svc.duration;
+  document.getElementById('sumFecha').textContent = fechaStr;
+  document.getElementById('sumHora').textContent = state.hour + ' hs';
+  document.getElementById('sumNombre').textContent = `${n} ${a}`;
+  document.getElementById('sumTel').textContent = t;
+}
+
+// ═══════════════════════════════════════════════
+//  CONFIRMAR
+// ═══════════════════════════════════════════════
+async function confirmarTurno() {
+  const svc = SERVICES.find(s => s.id === state.service);
+  const btn = document.querySelector('#panel4 .btn-confirm');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Reservando…';
+
+  const { data, error } = await supabase.from('turnos').insert({
+    servicio: svc.name,
+    duracion: svc.duration,
+    fecha: state.date,
+    hora: state.hour,
+    nombre: state.nombre,
+    apellido: state.apellido,
+    telefono: state.tel,
+    email: state.email || null,
+    notas: state.notas || null
+  }).select();
+
+  if (error) {
+    console.error('Error al guardar turno:', error);
+    btn.disabled = false;
+    btn.textContent = originalText;
+    alert('Hubo un problema al guardar tu turno. Por favor, intentá de nuevo o escribinos por WhatsApp.');
+    return;
+  }
+
+  await cargarTurnos();
+
+  // Build confirmation card
+  const date = new Date(state.date+'T12:00:00');
+  const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months2 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaStr = `${days[date.getDay()]} ${date.getDate()} de ${months2[date.getMonth()]} de ${date.getFullYear()}`;
+
+  document.getElementById('confirmCard').innerHTML = `
+    <div class="confirm-row">
+      <div class="confirm-row-icon">🌿</div>
+      <div><div class="confirm-row-label">Servicio</div><div class="confirm-row-text">${svc.name} · ${svc.duration}</div></div>
+    </div>
+    <div class="confirm-row">
+      <div class="confirm-row-icon">📅</div>
+      <div><div class="confirm-row-label">Fecha</div><div class="confirm-row-text">${fechaStr}</div></div>
+    </div>
+    <div class="confirm-row">
+      <div class="confirm-row-icon">🕐</div>
+      <div><div class="confirm-row-label">Horario</div><div class="confirm-row-text">${state.hour} hs</div></div>
+    </div>
+    <div class="confirm-row">
+      <div class="confirm-row-icon">👤</div>
+      <div><div class="confirm-row-label">Nombre</div><div class="confirm-row-text">${state.nombre} ${state.apellido}</div></div>
+    </div>
+    <div class="confirm-row">
+      <div class="confirm-row-icon">📱</div>
+      <div><div class="confirm-row-label">Teléfono</div><div class="confirm-row-text">${state.tel}</div></div>
+    </div>
+  `;
+
+  // Move to confirmation
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel5').classList.add('active');
+  for (let i=1; i<=4; i++) {
+    const el = document.getElementById(`s${i}`);
+    el.classList.remove('active'); el.classList.add('done');
+  }
+  btn.disabled = false;
+  btn.textContent = originalText;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function sendWhatsApp() {
+  const svc = SERVICES.find(s => s.id === state.service);
+  const date = new Date(state.date+'T12:00:00');
+  const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months2 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaStr = `${days[date.getDay()]} ${date.getDate()} de ${months2[date.getMonth()]}`;
+  const msg = `Hola Alambú 🌿 Acabo de reservar un turno:\n\n*Servicio:* ${svc.name}\n*Fecha:* ${fechaStr}\n*Horario:* ${state.hour} hs\n*Nombre:* ${state.nombre} ${state.apellido}\n\n¡Gracias!`;
+  window.open(`https://wa.me/5492615371450?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function resetForm() {
+  state = { step:1, service:null, date:null, hour:null, nombre:'', apellido:'', tel:'', email:'', notas:'' };
+  document.getElementById('inputNombre').value='';
+  document.getElementById('inputApellido').value='';
+  document.getElementById('inputTel').value='';
+  document.getElementById('inputEmail').value='';
+  document.getElementById('inputNotas').value='';
+  document.querySelectorAll('.service-option').forEach(el => el.classList.remove('selected'));
+  document.getElementById('nextToStep2').disabled = true;
+  document.getElementById('nextToStep3').disabled = true;
+  document.getElementById('nextToStep4').disabled = true;
+  calYear = new Date().getFullYear(); calMonth = new Date().getMonth();
+  goTo(1);
+}
+
+// ═══════════════════════════════════════════════
+//  ADMIN PANEL
+// ═══════════════════════════════════════════════
+const ADMIN_PASSWORD = 'alambu2025'; // Change this!
+
+function openAdmin() {
+  document.getElementById('adminOverlay').classList.add('open');
+  document.getElementById('adminLoginSection').style.display = 'block';
+  document.getElementById('adminContent').style.display = 'none';
+  document.getElementById('adminPass').value = '';
+  document.getElementById('adminError').style.display = 'none';
+}
+function closeAdmin() {
+  document.getElementById('adminOverlay').classList.remove('open');
+}
+function closeAdminOutside(e) {
+  if (e.target === document.getElementById('adminOverlay')) closeAdmin();
+}
+async function adminLogin() {
+  const pass = document.getElementById('adminPass').value;
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('adminLoginSection').style.display = 'none';
+    document.getElementById('adminContent').style.display = 'block';
+    await renderAdminPanel();
+  } else {
+    document.getElementById('adminError').style.display = 'block';
+  }
+}
+
+async function renderAdminPanel() {
+  document.getElementById('adminTurnosList').innerHTML = `<div class="turno-empty">Cargando…</div>`;
+  await cargarTurnos();
+
+  // Stats
+  const today = new Date().toISOString().slice(0,10);
+  const todayCount = TURNOS.filter(t => t.date === today).length;
+  const totalCount = TURNOS.length;
+  document.getElementById('adminStats').innerHTML = `
+    <div class="stat-box"><div class="stat-num">${todayCount}</div><div class="stat-label">Hoy</div></div>
+    <div class="stat-box"><div class="stat-num">${totalCount}</div><div class="stat-label">Total</div></div>
+  `;
+
+  // Get unique dates with turnos
+  const dates = [...new Set(TURNOS.map(t => t.date))].sort();
+  if (dates.length === 0) {
+    document.getElementById('adminDayTabs').innerHTML = '';
+    document.getElementById('adminTurnosList').innerHTML = `<div class="turno-empty">🌿 No hay turnos registrados todavía.</div>`;
+    return;
+  }
+
+  // Add today if not present
+  if (!dates.includes(today)) dates.unshift(today);
+  else dates.sort();
+
+  // Show last 7 dates + today
+  const displayDates = dates.slice(-7);
+  let activeDate = displayDates.includes(today) ? today : displayDates[displayDates.length-1];
+
+  const months2 = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  document.getElementById('adminDayTabs').innerHTML = displayDates.map(d => {
+    const dt = new Date(d+'T12:00:00');
+    const label = d === today ? 'Hoy' : `${dt.getDate()} ${months2[dt.getMonth()]}`;
+    return `<button class="day-tab ${d===activeDate?'active':''}" onclick="switchAdminDay('${d}', this)">${label}</button>`;
+  }).join('');
+
+  renderTurnosForDate(activeDate);
+}
+
+function switchAdminDay(date, btn) {
+  document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTurnosForDate(date);
+}
+
+function renderTurnosForDate(date) {
+  const dayTurnos = TURNOS.filter(t => t.date === date).sort((a,b) => a.hour.localeCompare(b.hour));
+  if (dayTurnos.length === 0) {
+    document.getElementById('adminTurnosList').innerHTML = `<div class="turno-empty">Sin turnos para este día.</div>`;
+    return;
+  }
+  document.getElementById('adminTurnosList').innerHTML = dayTurnos.map(t => `
+    <div class="turno-card">
+      <div class="turno-hora">${t.hour}</div>
+      <div class="turno-info">
+        <div class="turno-name">${t.nombre} ${t.apellido}</div>
+        <div class="turno-service">${t.service}</div>
+        <div class="turno-phone">📱 ${t.tel}</div>
+        ${t.notas ? `<div class="turno-notes">"${t.notas}"</div>` : ''}
+      </div>
+      <div class="turno-badge">${t.duration}</div>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>
