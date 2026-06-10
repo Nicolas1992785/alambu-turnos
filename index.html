@@ -215,7 +215,7 @@
     .disp-hour-toggle {
       padding: 10px 6px; text-align: center; border: 1.5px solid var(--border); border-radius: 6px;
       font-size: 12px; cursor: pointer; transition: all 0.2s; color: var(--brown-light); background: var(--cream-mid);
-user-select: none;
+      user-select: none;
     }
     .disp-hour-toggle.enabled { background: var(--olive); border-color: var(--olive); color: #fff; font-weight: 500; }
     #dispHorariosWrapper.disabled-section { opacity: 0.4; pointer-events: none; }
@@ -229,6 +229,7 @@ user-select: none;
     .turno-name { font-size: 13px; font-weight: 500; color: var(--brown); }
     .turno-service { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; }
     .turno-phone { font-size: 11px; color: var(--brown-light); margin-top: 2px; }
+    .turno-prof { font-size: 11px; color: var(--olive); margin-top: 2px; font-weight: 500; }
     .turno-notes { font-size: 11px; color: var(--brown-light); font-style: italic; margin-top: 3px; }
     .turno-empty { text-align: center; padding: 2.5rem; color: var(--brown-light); font-size: 13px; }
     .turno-badge { font-size: 9px; background: var(--olive-light); color: #fff; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.08em; text-transform: uppercase; align-self: flex-start; margin-top: 2px; }
@@ -427,7 +428,7 @@ user-select: none;
       <button class="btn-back" onclick="goTo(3)">← Volver</button>
       <button class="btn-confirm" onclick="confirmarTurno()">Confirmar turno ✓</button>
     </div>
-  </div>
+    </div>
 
   <!-- STEP 5: CONFIRMADO -->
   <div class="step-panel" id="panel5">
@@ -437,7 +438,7 @@ user-select: none;
       <p class="confirm-sub">Tu reserva fue registrada. En breve nos comunicamos por WhatsApp para confirmarte todo.</p>
       <div class="confirm-card" id="confirmCard"></div>
       <button class="whatsapp-btn" onclick="sendWhatsApp()">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.558 4.11 1.528 5.832L0 24l6.335-1.652C8.037 23.39 9.982 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.893 0-3.672-.513-5.207-1.41l-.372-.22-3.867 1.009 1.026-3.751-.243-.385A9.937 9.937 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg> 
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.558 4.11 1.528 5.832L0 24l6.335-1.652C8.037 23.39 9.982 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.893 0-3.672-.513-5.207-1.41l-.372-.22-3.867 1.009 1.026-3.751-.243-.385A9.937 9.937 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
         Avisar por WhatsApp
       </button>
       <div style="margin-top: 1.5rem;">
@@ -480,6 +481,10 @@ user-select: none;
 
       <div id="adminDispSection" style="display:none;">
         <div class="disp-date-picker">
+          <label class="form-label">Profesional</label>
+          <select class="form-input" id="dispProfSelect" onchange="loadDispForDate()"></select>
+        </div>
+        <div class="disp-date-picker">
           <label class="form-label">Elegí una fecha para configurar</label>
           <input type="date" class="form-input" id="dispDateInput" onchange="loadDispForDate()">
         </div>
@@ -487,11 +492,11 @@ user-select: none;
           <div class="disp-cerrado-row">
             <label class="disp-toggle">
               <input type="checkbox" id="dispCerrado" onchange="toggleDispCerrado()">
-              <span>Marcar este día como cerrado (sin turnos disponibles)</span>
+              <span>Marcar este día como cerrado para esta profesional</span>
             </label>
           </div>
           <div id="dispHorariosWrapper">
-            <p class="disp-subtitle">Tildá los horarios disponibles para este día:</p>
+            <p class="disp-subtitle">Tildá los horarios disponibles para esta profesional este día:</p>
             <div class="disp-hours-grid" id="dispHoursGrid"></div>
           </div>
           <button class="admin-btn" onclick="guardarDisponibilidad()" style="margin-top:1.2rem;">Guardar disponibilidad</button>
@@ -521,6 +526,7 @@ const SERVICES = [
 ];
 
 const HORARIOS = ['09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30'];
+
 // Simulated taken slots (key = "YYYY-MM-DD_HH:MM")
 const TAKEN_DEMO = new Set();
 // Pre-fill some demo taken slots
@@ -538,8 +544,15 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // Storage for turnos (cargado desde Supabase)
 let TURNOS = [];
 
-// Cache de disponibilidad por fecha: { 'YYYY-MM-DD': { horarios: [...], cerrado: bool } }
+// Cache de disponibilidad general por fecha (legacy, ya no se usa para el cliente
+// pero se mantiene por compatibilidad): { 'YYYY-MM-DD': { horarios: [...], cerrado: bool } }
 let DISPONIBILIDAD = {};
+
+// Profesionales: [{ id, nombre, servicios: [...] }]
+let PROFESIONALES = [];
+
+// Disponibilidad por profesional: { profesionalId: { 'YYYY-MM-DD': { horarios: [...], cerrado: bool } } }
+let DISP_PROFESIONALES = {};
 
 async function cargarTurnos() {
   const { data, error } = await sb.from('turnos').select('*');
@@ -559,6 +572,8 @@ async function cargarTurnos() {
     tel: t.telefono,
     email: t.email,
     notas: t.notas,
+    profesionalId: t.profesional_id,
+    profesionalNombre: t.profesional_nombre,
     createdAt: t.created_at
   }));
 }
@@ -573,6 +588,100 @@ async function cargarDisponibilidad() {
   (data || []).forEach(d => {
     DISPONIBILIDAD[d.fecha] = { horarios: d.horarios || [], cerrado: !!d.cerrado };
   });
+}
+
+async function cargarProfesionales() {
+  const { data, error } = await sb.from('profesionales').select('*').order('nombre');
+  if (error) {
+    console.error('Error cargando profesionales:', error);
+    return;
+  }
+  PROFESIONALES = (data || []).map(p => ({
+    id: p.id,
+    nombre: p.nombre,
+    servicios: p.servicios || []
+  }));
+}
+
+async function cargarDisponibilidadProfesionales() {
+  const { data, error } = await sb.from('disponibilidad_profesional').select('*');
+  if (error) {
+    console.error('Error cargando disponibilidad de profesionales:', error);
+    return;
+  }
+  DISP_PROFESIONALES = {};
+  (data || []).forEach(d => {
+    if (!DISP_PROFESIONALES[d.profesional_id]) DISP_PROFESIONALES[d.profesional_id] = {};
+    DISP_PROFESIONALES[d.profesional_id][d.fecha] = { horarios: d.horarios || [], cerrado: !!d.cerrado };
+  });
+}
+
+// Disponibilidad por defecto para una profesional en una fecha, si no configuró nada:
+// domingo cerrado, resto de días todos los horarios.
+function horariosBaseParaFecha(iso) {
+  const dow = new Date(iso+'T12:00:00').getDay();
+  if (dow === 0) return [];
+  return HORARIOS;
+}
+
+// Horarios habilitados para una profesional puntual en una fecha
+function horariosDeProfesional(profesionalId, iso) {
+  const porFecha = DISP_PROFESIONALES[profesionalId];
+  const config = porFecha ? porFecha[iso] : null;
+  if (config) {
+    if (config.cerrado) return [];
+    return config.horarios && config.horarios.length ? config.horarios : horariosBaseParaFecha(iso);
+  }
+  return horariosBaseParaFecha(iso);
+}
+
+// Profesionales que pueden realizar un servicio dado
+function profesionalesParaServicio(serviceName) {
+  return PROFESIONALES.filter(p => p.servicios.includes(serviceName));
+}
+
+// Devuelve la lista de horarios disponibles para un servicio en una fecha dada,
+// es decir: la unión de horarios donde AL MENOS UNA profesional capacitada
+// está disponible y no tiene ya un turno ocupado en ese horario.
+function horariosDisponiblesParaServicioYFecha(serviceName, iso) {
+  const profesionales = profesionalesParaServicio(serviceName);
+  if (profesionales.length === 0) return [];
+  const ocupadosPorProfesional = {};
+  TURNOS.filter(t => t.date === iso && t.profesionalId).forEach(t => {
+    if (!ocupadosPorProfesional[t.profesionalId]) ocupadosPorProfesional[t.profesionalId] = new Set();
+    ocupadosPorProfesional[t.profesionalId].add(t.hour);
+  });
+
+  const disponibles = new Set();
+  profesionales.forEach(p => {
+    const horariosProf = horariosDeProfesional(p.id, iso);
+    const ocupados = ocupadosPorProfesional[p.id] || new Set();
+    horariosProf.forEach(h => {
+      if (!ocupados.has(h)) disponibles.add(h);
+    });
+  });
+
+  return HORARIOS.filter(h => disponibles.has(h));
+}
+
+// Asigna automáticamente una profesional disponible para un servicio, fecha y hora dados.
+// Devuelve { id, nombre } o null si no hay ninguna disponible.
+function asignarProfesional(serviceName, iso, hora) {
+  const profesionales = profesionalesParaServicio(serviceName);
+  const ocupadosPorProfesional = {};
+  TURNOS.filter(t => t.date === iso && t.profesionalId).forEach(t => {
+    if (!ocupadosPorProfesional[t.profesionalId]) ocupadosPorProfesional[t.profesionalId] = new Set();
+    ocupadosPorProfesional[t.profesionalId].add(t.hour);
+  });
+
+  for (const p of profesionales) {
+    const horariosProf = horariosDeProfesional(p.id, iso);
+    const ocupados = ocupadosPorProfesional[p.id] || new Set();
+    if (horariosProf.includes(hora) && !ocupados.has(hora)) {
+      return { id: p.id, nombre: p.nombre };
+    }
+  }
+  return null;
 }
 
 // Devuelve la lista de horarios habilitados para una fecha dada,
@@ -608,7 +717,7 @@ let calMonth = new Date().getMonth();
 // ═══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
   renderServices();
-  await Promise.all([cargarTurnos(), cargarDisponibilidad()]);
+  await Promise.all([cargarTurnos(), cargarDisponibilidad(), cargarProfesionales(), cargarDisponibilidadProfesionales()]);
   renderCalendar();
 });
 
@@ -657,7 +766,7 @@ function goTo(step) {
 // ═══════════════════════════════════════════════
 //  STEP 1: SERVICE
 // ═══════════════════════════════════════════════
-  function selectService(id) {
+function selectService(id) {
   state.service = id;
   document.querySelectorAll('.service-option').forEach(el => el.classList.remove('selected'));
   document.getElementById(`svc_${id}`).classList.add('selected');
@@ -686,20 +795,25 @@ function renderCalendar() {
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
 
+  const svc = SERVICES.find(s => s.id === state.service);
+  const serviceName = svc ? svc.name : null;
+
   let html = '';
   for (let i=0; i<firstDay; i++) html += `<div class="cal-cell empty"></div>`;
   for (let d=1; d<=daysInMonth; d++) {
     const date = new Date(calYear, calMonth, d);
     const isPast = date < today;
     const iso = date.toISOString().slice(0,10);
-    const cerrado = diaCerrado(iso);
+    const sinHorarios = serviceName
+      ? horariosDisponiblesParaServicioYFecha(serviceName, iso).length === 0
+      : diaCerrado(iso);
     const isToday = date.getTime() === today.getTime();
     const isSelected = state.date === iso;
     const cls = ['cal-cell'];
-    if (isPast || cerrado) cls.push('disabled');
+    if (isPast || sinHorarios) cls.push('disabled');
     else if (isSelected) cls.push('selected');
     else if (isToday) cls.push('today');
-    const click = (isPast || cerrado) ? '' : `onclick="selectDate('${iso}')"`;
+    const click = (isPast || sinHorarios) ? '' : `onclick="selectDate('${iso}')"`;
     html += `<div class="${cls.join(' ')}" ${click}>${d}</div>`;
   }
   document.getElementById('calGrid').innerHTML = html;
@@ -711,7 +825,7 @@ async function selectDate(iso) {
   renderCalendar();
   document.getElementById('hoursTitle').textContent = 'Cargando horarios…';
   document.getElementById('hoursGrid').innerHTML = '';
-  await Promise.all([cargarTurnos(), cargarDisponibilidad()]);
+  await Promise.all([cargarTurnos(), cargarDisponibilidad(), cargarDisponibilidadProfesionales()]);
   renderHours(iso);
 }
 
@@ -721,27 +835,26 @@ function renderHours(iso) {
   const months2 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   document.getElementById('hoursTitle').textContent = `${days[date.getDay()]} ${date.getDate()} de ${months2[date.getMonth()]}`;
 
-  const horariosHabilitados = new Set(horariosDisponiblesParaFecha(iso));
+  const svc = SERVICES.find(s => s.id === state.service);
+  const serviceName = svc ? svc.name : null;
 
-  if (horariosHabilitados.size === 0) {
+  const horariosDisponibles = serviceName
+    ? horariosDisponiblesParaServicioYFecha(serviceName, iso)
+    : [];
+
+  if (horariosDisponibles.length === 0) {
     document.getElementById('hoursGrid').innerHTML = `<div class="turno-empty" style="grid-column:1/-1;">No hay horarios disponibles para este día.</div>`;
     return;
   }
 
-  // Merge demo taken + stored turnos for this date
-  const taken = new Set(TAKEN_DEMO);
-  TURNOS.filter(t => t.date === iso).forEach(t => taken.add(`${iso}_${t.hour}`));
+  const horariosSet = new Set(horariosDisponibles);
 
   let html = '';
-  HORARIOS.filter(h => horariosHabilitados.has(h)).forEach(h => {
-    const key = `${iso}_${h}`;
-    const isTaken = taken.has(key);
+  HORARIOS.filter(h => horariosSet.has(h)).forEach(h => {
     const isSelected = state.hour === h;
     const cls = ['hour-slot'];
-    if (isTaken) cls.push('taken');
-    else if (isSelected) cls.push('selected');
-    const click = isTaken ? '' : `onclick="selectHour('${h}')"`;
-    html += `<div class="${cls.join(' ')}" ${click}>${h}</div>`;
+    if (isSelected) cls.push('selected');
+    html += `<div class="${cls.join(' ')}" onclick="selectHour('${h}')">${h}</div>`;
   });
   document.getElementById('hoursGrid').innerHTML = html;
 }
@@ -753,7 +866,9 @@ function selectHour(h) {
 }
 
 // ═══════════════════════════════════════════════
-//  STEP 3: DATOS
+
+  // Turnos ya ocupados en esa fecha, agrupados por profesional
+  //  STEP 3: DATOS
 // ═══════════════════════════════════════════════
 function checkStep3() {
   const n = document.getElementById('inputNombre').value.trim();
@@ -797,6 +912,19 @@ async function confirmarTurno() {
   btn.disabled = true;
   btn.textContent = 'Reservando…';
 
+  // Refrescar turnos para minimizar conflictos de asignación
+  await cargarTurnos();
+
+  const profesional = asignarProfesional(svc.name, state.date, state.hour);
+  if (!profesional) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    alert('Lo sentimos, ese horario ya no está disponible. Por favor, elegí otro horario.');
+    await selectDate(state.date);
+    goTo(2);
+    return;
+  }
+
   const { data, error } = await sb.from('turnos').insert({
     servicio: svc.name,
     duracion: svc.duration,
@@ -806,7 +934,9 @@ async function confirmarTurno() {
     apellido: state.apellido,
     telefono: state.tel,
     email: state.email || null,
-    notas: state.notas || null
+    notas: state.notas || null,
+    profesional_id: profesional.id,
+    profesional_nombre: profesional.nombre
   }).select();
 
   if (error) {
@@ -916,7 +1046,7 @@ async function adminLogin() {
 
 async function renderAdminPanel() {
   document.getElementById('adminTurnosList').innerHTML = `<div class="turno-empty">Cargando…</div>`;
-  await cargarTurnos();
+  await Promise.all([cargarTurnos(), cargarProfesionales()]);
 
   // Stats
   const today = new Date().toISOString().slice(0,10);
@@ -948,7 +1078,7 @@ async function renderAdminPanel() {
     const dt = new Date(d+'T12:00:00');
     const label = d === today ? 'Hoy' : `${dt.getDate()} ${months2[dt.getMonth()]}`;
     return `<button class="day-tab ${d===activeDate?'active':''}" onclick="switchAdminDay('${d}', this)">${label}</button>`;
-  }).join('');
+    }).join('');
 
   renderTurnosForDate(activeDate);
 }
@@ -971,6 +1101,7 @@ function renderTurnosForDate(date) {
       <div class="turno-info">
         <div class="turno-name">${t.nombre} ${t.apellido}</div>
         <div class="turno-service">${t.service}</div>
+        ${t.profesionalNombre ? `<div class="turno-prof">👩‍🦰 ${t.profesionalNombre}</div>` : ''}
         <div class="turno-phone">📱 ${t.tel}</div>
         ${t.notas ? `<div class="turno-notes">"${t.notas}"</div>` : ''}
       </div>
@@ -990,12 +1121,16 @@ function switchMainTab(tab) {
   document.getElementById('adminDispSection').style.display = isTurnos ? 'none' : 'block';
 
   if (!isTurnos) {
+    const select = document.getElementById('dispProfSelect');
+    if (!select.options.length) {
+      select.innerHTML = PROFESIONALES.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+    }
     // Al entrar a Disponibilidad, preseleccionar hoy si no hay fecha elegida
     const input = document.getElementById('dispDateInput');
     if (!input.value) {
       input.value = new Date().toISOString().slice(0,10);
-      loadDispForDate();
     }
+    loadDispForDate();
   }
 }
 
@@ -1004,22 +1139,23 @@ function switchMainTab(tab) {
 // ═══════════════════════════════════════════════
 async function loadDispForDate() {
   const iso = document.getElementById('dispDateInput').value;
-  if (!iso) return;
+  const profesionalId = document.getElementById('dispProfSelect').value;
+  if (!iso || !profesionalId) return;
 
   document.getElementById('dispEditor').style.display = 'block';
   document.getElementById('dispSavedMsg').classList.remove('show');
 
-  await cargarDisponibilidad();
+  await cargarDisponibilidadProfesionales();
 
-  const config = DISPONIBILIDAD[iso];
-  const dow = new Date(iso+'T12:00:00').getDay();
-  const cerradoPorDefecto = dow === 0;
+  const porFecha = DISP_PROFESIONALES[profesionalId];
+  const config = porFecha ? porFecha[iso] : null;
+  const cerradoPorDefecto = horariosBaseParaFecha(iso).length === 0;
 
   const cerrado = config ? config.cerrado : cerradoPorDefecto;
   const horariosActivos = new Set(
     config
-      ? (config.cerrado ? [] : (config.horarios && config.horarios.length ? config.horarios : HORARIOS))
-      : (cerradoPorDefecto ? [] : HORARIOS)
+      ? (config.cerrado ? [] : (config.horarios && config.horarios.length ? config.horarios : horariosBaseParaFecha(iso)))
+      : horariosBaseParaFecha(iso)
   );
 
   document.getElementById('dispCerrado').checked = cerrado;
@@ -1046,7 +1182,8 @@ function toggleDispCerrado() {
 
 async function guardarDisponibilidad() {
   const iso = document.getElementById('dispDateInput').value;
-  if (!iso) return;
+  const profesionalId = document.getElementById('dispProfSelect').value;
+  if (!iso || !profesionalId) return;
 
   const cerrado = document.getElementById('dispCerrado').checked;
   const horarios = cerrado
@@ -1058,11 +1195,12 @@ async function guardarDisponibilidad() {
   btn.disabled = true;
   btn.textContent = 'Guardando…';
 
-  const { error } = await sb.from('disponibilidad').upsert({
+  const { error } = await sb.from('disponibilidad_profesional').upsert({
+    profesional_id: profesionalId,
     fecha: iso,
     horarios: horarios,
     cerrado: cerrado
-  });
+  }, { onConflict: 'profesional_id,fecha' });
 
   btn.disabled = false;
   btn.textContent = originalText;
@@ -1073,7 +1211,7 @@ async function guardarDisponibilidad() {
     return;
   }
 
-  await cargarDisponibilidad();
+  await cargarDisponibilidadProfesionales();
 
   const msg = document.getElementById('dispSavedMsg');
   msg.classList.add('show');
