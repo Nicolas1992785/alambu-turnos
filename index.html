@@ -479,13 +479,13 @@ const dd = demoDate.toISOString().slice(0,10);
 // ═══════════════════════════════════════════════
 const SUPABASE_URL = 'https://enbiwgxdtimisgnjjmch.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_iQh_3Ojf_ULpAfub3tXeDA_qh8yMX0q';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Storage for turnos (cargado desde Supabase)
 let TURNOS = [];
 
 async function cargarTurnos() {
-  const { data, error } = await supabase.from('turnos').select('*');
+  const { data, error } = await sb.from('turnos').select('*');
   if (error) {
     console.error('Error cargando turnos:', error);
     return;
@@ -696,7 +696,7 @@ async function confirmarTurno() {
   btn.disabled = true;
   btn.textContent = 'Reservando…';
 
-  const { data, error } = await supabase.from('turnos').insert({
+  const { data, error } = await sb.from('turnos').insert({
     servicio: svc.name,
     duracion: svc.duration,
     fecha: state.date,
