@@ -779,6 +779,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderServices() {
   const g = document.getElementById('servicesGrid');
   g.innerHTML = SERVICES.map(s => `
+    <div class="service-option" id="svc_${s.id}" onclick="selectService(${s.id})">
+      <div class="service-photo" style="background-image:url('${s.photo}')">
+        <div class="service-icon-badge">${s.icon}</div>
+      </div>
+      <div class="service-body">
+        <div class="service-name">${s.name}</div>
+        <div class="service-duration">${s.duration}</div>
+        <div class="service-desc-small">${s.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
 function renderServices() {
   const g = document.getElementById('servicesGrid');
   g.innerHTML = SERVICES.map(s => `
