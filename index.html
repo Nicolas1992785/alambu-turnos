@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alambú · Reservar Turno</title>
+  <title>Alambú · Reservar Turno</title>
   <meta name="description" content="Reservá tu turno online en Alambú. Belleza y bienestar para volver a vos.">
 
   <meta property="og:title" content="Alambú · Reservar Turno">
@@ -16,6 +16,7 @@
   <meta name="twitter:title" content="Alambú · Reservar Turno">
   <meta name="twitter:description" content="Belleza y bienestar para volver a vos. Reservá tu turno online en pocos pasos.">
   <meta name="twitter:image" content="https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/og-image.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -103,7 +104,7 @@
       border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center;
       font-weight: 600; z-index: 2;
     }
- .service-photo { position: relative; height: 110px; background-size: cover; background-position: center; }
+    .service-photo { position: relative; height: 110px; background-size: cover; background-position: center; }
     .service-icon-badge {
       position: absolute; left: 12px; bottom: -18px; width: 40px; height: 40px; border-radius: 50%;
       background: var(--cream-mid); border: 2px solid #fff; display: flex; align-items: center;
@@ -114,6 +115,18 @@
     .service-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; color: var(--brown); margin-bottom: 0.3rem; }
     .service-duration { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
     .service-desc-small { font-size: 11.5px; color: var(--brown-light); line-height: 1.5; }
+
+    /* ── STEP 1.5: VARIANTES / PRECIOS ── */
+    .variants-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
+    .variant-option {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--cream-mid); border: 2px solid var(--border); border-radius: 10px;
+      padding: 1rem 1.4rem; cursor: pointer; transition: all 0.2s;
+    }
+    .variant-option:hover { border-color: var(--olive-light); }
+    .variant-option.selected { border-color: var(--olive); background: rgba(107,124,92,0.06); }
+    .variant-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--brown); }
+    .variant-price { font-size: 15px; color: var(--gold); font-weight: 600; letter-spacing: 0.04em; }
 
     /* ── STEP 2: CALENDARIO ── */
     /* ── PROFESSIONAL PICKER ── */
@@ -165,7 +178,7 @@
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group.full { grid-column: 1 / -1; }
     .form-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brown-light); }
-    .form-input {
+   .form-input {
       padding: 12px 14px; background: var(--cream-mid); border: 1.5px solid var(--border); border-radius: 6px;
       font-family: 'Jost', sans-serif; font-size: 13px; color: var(--brown); outline: none;
       transition: border-color 0.2s;
@@ -277,16 +290,6 @@
     .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--olive); line-height: 1; }
     .stat-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brown-light); margin-top: 2px; }
 
-    /* ── WA FLOAT ── */
-    .wa-float {
-      position: fixed; bottom: 24px; right: 24px; z-index: 90;
-      width: 52px; height: 52px; background: #25D366; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 16px rgba(37,211,102,0.4); text-decoration: none; transition: transform 0.2s;
-    }
-    .wa-float:hover { transform: scale(1.08); }
-    .wa-float svg { width: 26px; height: 26px; fill: #fff; }
-
     /* ── RESPONSIVE ── */
     @media (max-width: 600px) {
       nav { padding: 0.9rem 1.2rem; }
@@ -355,7 +358,7 @@
   </div>
   <div class="step-line"></div>
   <div class="step" id="s3">
-    <div class="step-num">3</div>
+  <div class="step-num">3</div>
     <div class="step-label">Tus datos</div>
   </div>
   <div class="step-line"></div>
@@ -376,6 +379,17 @@
     <div class="nav-buttons">
       <span></span>
       <button class="btn-next" id="nextToStep2" disabled onclick="goTo(2)">Elegir fecha →</button>
+    </div>
+  </div>
+
+  <!-- STEP 1.5: VARIANTES / PRECIOS -->
+  <div class="step-panel" id="panelVariants">
+    <div class="step-title" id="variantsTitle">Elegí la técnica</div>
+    <p class="step-subtitle">Seleccioná la opción que más te guste</p>
+    <div class="variants-list" id="variantsList"></div>
+    <div class="nav-buttons">
+      <button class="btn-back" onclick="goTo(1)">← Volver</button>
+      <button class="btn-next" id="nextFromVariants" disabled onclick="goTo(2)">Elegir fecha →</button>
     </div>
   </div>
 
@@ -417,7 +431,7 @@
       </div>
     </div>
     <div class="nav-buttons">
-      <button class="btn-back" onclick="goTo(1)">← Volver</button>
+      <button class="btn-back" onclick="goBackFromStep2()">← Volver</button>
       <button class="btn-next" id="nextToStep3" disabled onclick="goTo(3)">Mis datos →</button>
     </div>
   </div>
@@ -462,6 +476,10 @@
       <div class="summary-row">
         <span class="summary-key">Servicio</span>
         <span class="summary-val" id="sumServicio">—</span>
+      </div>
+      <div class="summary-row" id="sumPrecioRow" style="display:none;">
+        <span class="summary-key">Precio</span>
+        <span class="summary-val" id="sumPrecio">—</span>
       </div>
       <div class="summary-row">
         <span class="summary-key">Duración estimada</span>
@@ -520,7 +538,7 @@
 <div class="admin-overlay" id="adminOverlay" onclick="closeAdminOutside(event)">
   <div class="admin-drawer" id="adminDrawer">
     <div class="admin-header">
-      <div class="admin-title">Panel Alambú</div>
+<div class="admin-title">Panel Alambú</div>
       <button class="admin-close" onclick="closeAdmin()">✕</button>
     </div>
     <p class="admin-subtitle">Turnos agendados</p>
@@ -539,6 +557,7 @@
         <button class="main-tab active" id="mainTabTurnos" onclick="switchMainTab('turnos')">Turnos</button>
         <button class="main-tab" id="mainTabDisp" onclick="switchMainTab('disponibilidad')">Disponibilidad</button>
       </div>
+
       <div id="adminTurnosSection">
         <div class="admin-stats" id="adminStats"></div>
         <div class="admin-day-tabs" id="adminDayTabs"></div>
@@ -573,23 +592,25 @@
   </div>
 </div>
 
-<!-- WA FLOAT -->
-<a href="https://wa.me/5492615371450" target="_blank" rel="noopener" class="wa-float" title="Escribinos por WhatsApp">
-  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.558 4.11 1.528 5.832L0 24l6.335-1.652C8.037 23.39 9.982 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.893 0-3.672-.513-5.207-1.41l-.372-.22-3.867 1.009 1.026-3.751-.243-.385A9.937 9.937 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-</a>
-
 <script>
 // ═══════════════════════════════════════════════
 //  DATA
 // ═══════════════════════════════════════════════
 const SERVICES = [
-{ id: 1, icon: '👁️', name: 'Extensión de pestañas', duration: '90–120 min', desc: 'Pelo por pelo, clásica, volumen y mega volumen con materiales premium.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/pestanas.jpg' },
-{ id: 2, icon: '✨', name: 'Diseño de cejas', duration: '45–60 min', desc: 'Laminado y perfilado, henna y microblading para cejas definidas.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/cejas.jpg' },
-{ id: 3, icon: '🌿', name: 'Tratamiento facial', duration: '60–90 min', desc: 'Limpieza, hidratación, tratamiento Hidralips y rituales de luminosidad.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/facial.jpg' },
-{ id: 4, icon: '💆', name: 'Masajes relajantes', duration: '60 min', desc: 'Masajes ayurvédicos y experiencias que equilibran cuerpo y mente.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/masajes.jpg' },
-{ id: 5, icon: '🌸', name: 'Rituales de bienestar', duration: '75–90 min', desc: 'Tarot, Tameana, Péndulo Hebreo, Reiki, limpieza energética, Medium Unidad y Constelación Familiar.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/bienestar.jpg' },
-{ id: 6, icon: '💅', name: 'Manicuría', duration: '60 min', desc: 'Cuidado completo para tus manos.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/unas.jpg' },
+  { id: 1, icon: '👁️', name: 'Extensión de pestañas', duration: '90–120 min', desc: 'Pelo por pelo, clásica, volumen y mega volumen con materiales premium.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/pestanas.jpg', variants: [
+    { name: 'Clásicas', price: 28000 },
+    { name: 'Húmedas', price: 30000 },
+    { name: 'Tecnológicas YY', price: 36000 },
+    { name: 'Tecnológicas 5D', price: 42000 },
+    { name: 'CAIRO', price: 46000 },
+  ] },
+  { id: 2, icon: '✨', name: 'Diseño de cejas', duration: '45–60 min', desc: 'Laminado y perfilado, henna y microblading para cejas definidas.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/cejas.jpg' },
+  { id: 3, icon: '🌿', name: 'Tratamiento facial', duration: '60–90 min', desc: 'Limpieza, hidratación, tratamiento Hidralips y rituales de luminosidad.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/facial.jpg' },
+  { id: 4, icon: '💆', name: 'Masajes relajantes', duration: '60 min', desc: 'Masajes ayurvédicos y experiencias que equilibran cuerpo y mente.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/masajes.jpg' },
+  { id: 5, icon: '🌸', name: 'Rituales de bienestar', duration: '75–90 min', desc: 'Tarot, Tameana, Péndulo Hebreo, Reiki, limpieza energética, Medium Unidad y Constelación Familiar.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/bienestar.jpg' },
+  { id: 6, icon: '💅', name: 'Manicuría', duration: '60 min', desc: 'Cuidado completo para tus manos.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/unas.jpg' },
 ];
+
 
 const HORARIOS = ['09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30'];
 
@@ -697,7 +718,7 @@ function horariosDeProfesional(profesionalId, iso) {
   if (config) {
     if (config.cerrado) return [];
     return config.horarios && config.horarios.length ? config.horarios : horariosBaseParaFecha(iso);
-  }
+ }
   return horariosBaseParaFecha(iso);
 }
 
@@ -708,7 +729,7 @@ function profesionalesParaServicio(serviceName) {
 
 // Devuelve la lista de horarios disponibles para un servicio en una fecha dada,
 // es decir: la unión de horarios donde AL MENOS UNA profesional capacitada
-  // está disponible y no tiene ya un turno ocupado en ese horario.
+// está disponible y no tiene ya un turno ocupado en ese horario.
 function horariosDisponiblesParaServicioYFecha(serviceName, iso, profesionalId) {
   let profesionales = profesionalesParaServicio(serviceName);
   if (profesionalId) profesionales = profesionales.filter(p => p.id === profesionalId);
@@ -778,7 +799,7 @@ function diaCerrado(iso) {
 // ═══════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════
-let state = { step:1, service:null, date:null, hour:null, profesionalId:null, nombre:'', apellido:'', tel:'', email:'', notas:'' };
+let state = { step:1, service:null, variant:null, date:null, hour:null, profesionalId:null, nombre:'', apellido:'', tel:'', email:'', notas:'' };
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 
@@ -795,7 +816,7 @@ function renderServices() {
   const g = document.getElementById('servicesGrid');
   g.innerHTML = SERVICES.map(s => `
     <div class="service-option" id="svc_${s.id}" onclick="selectService(${s.id})">
-<div class="service-photo" style="background-image:url('${s.photo}')">
+      <div class="service-photo" style="background-image:url('${s.photo}')">
         <div class="service-icon-badge">${s.icon}</div>
       </div>
       <div class="service-body">
@@ -813,6 +834,10 @@ function renderServices() {
 function goTo(step) {
   // Validate
   if (step === 2 && !state.service) return;
+  if (step === 2) {
+    const svc = SERVICES.find(s => s.id === state.service);
+    if (svc && svc.variants && svc.variants.length && !state.variant) return;
+  }
   if (step === 3 && (!state.date || !state.hour)) return;
   if (step === 4) {
     const n = document.getElementById('inputNombre').value.trim();
@@ -822,14 +847,16 @@ function goTo(step) {
   }
 
   document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById(`panel${step}`).classList.add('active');
+  const panelId = step === 1.5 ? 'panelVariants' : `panel${step}`;
+  document.getElementById(panelId).classList.add('active');
 
   // Update stepper
+  const stepperStep = step === 1.5 ? 1 : step;
   for (let i=1; i<=4; i++) {
     const el = document.getElementById(`s${i}`);
     el.classList.remove('active','done');
-    if (i < step) el.classList.add('done');
-    else if (i === step) el.classList.add('active');
+    if (i < stepperStep) el.classList.add('done');
+    else if (i === stepperStep) el.classList.add('active');
   }
 
   if (step === 2) renderProfOptions();
@@ -843,13 +870,50 @@ function goTo(step) {
 // ═══════════════════════════════════════════════
 function selectService(id) {
   state.service = id;
+  state.variant = null;
   state.profesionalId = null;
   state.date = null;
   state.hour = null;
   document.querySelectorAll('.service-option').forEach(el => el.classList.remove('selected'));
   document.getElementById(`svc_${id}`).classList.add('selected');
-  document.getElementById('nextToStep2').disabled = false;
+
+  const svc = SERVICES.find(s => s.id === id);
+  if (svc && svc.variants && svc.variants.length) {
+    document.getElementById('nextToStep2').disabled = true;
+    renderVariants();
+    goTo(1.5);
+  } else {
+    document.getElementById('nextToStep2').disabled = false;
+    renderProfOptions();
+  }
+}
+
+function renderVariants() {
+  const svc = SERVICES.find(s => s.id === state.service);
+  if (!svc) return;
+  document.getElementById('variantsTitle').textContent = `Elegí la técnica · ${svc.name}`;
+  document.getElementById('variantsList').innerHTML = svc.variants.map((v, i) => `
+    <div class="variant-option ${state.variant === i ? 'selected' : ''}" onclick="selectVariant(${i})">
+      <span class="variant-name">${v.name}</span>
+      <span class="variant-price">$${v.price.toLocaleString('es-AR')}</span>
+    </div>
+  `).join('');   
+  document.getElementById('nextFromVariants').disabled = state.variant === null;
+}
+
+function selectVariant(i) {
+  state.variant = i;
+  renderVariants();
   renderProfOptions();
+}
+
+function goBackFromStep2() {
+  const svc = SERVICES.find(s => s.id === state.service);
+  if (svc && svc.variants && svc.variants.length) {
+    goTo(1.5);
+  } else {
+    goTo(1);
+  }
 }
 
 function renderProfOptions() {
@@ -888,7 +952,8 @@ function changeMonth(dir) {
   document.getElementById('hoursTitle').textContent = 'Seleccioná primero una fecha';
   renderCalendar();
 }
-  function renderCalendar() {
+
+function renderCalendar() {
   const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   document.getElementById('calMonthLabel').textContent = `${months[calMonth]} ${calYear}`;
 
@@ -993,7 +1058,15 @@ function fillSummary() {
   const months2 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const fechaStr = `${days[date.getDay()]} ${date.getDate()} de ${months2[date.getMonth()]} de ${date.getFullYear()}`;
 
-  document.getElementById('sumServicio').textContent = svc.name;
+  if (svc.variants && svc.variants.length && state.variant !== null) {
+    const v = svc.variants[state.variant];
+    document.getElementById('sumServicio').textContent = `${svc.name} - ${v.name}`;
+    document.getElementById('sumPrecio').textContent = `$${v.price.toLocaleString('es-AR')}`;
+    document.getElementById('sumPrecioRow').style.display = 'flex';
+  } else {
+    document.getElementById('sumServicio').textContent = svc.name;
+    document.getElementById('sumPrecioRow').style.display = 'none';
+  }
   document.getElementById('sumDuracion').textContent = svc.duration;
   document.getElementById('sumFecha').textContent = fechaStr;
   document.getElementById('sumHora').textContent = state.hour + ' hs';
@@ -1005,13 +1078,15 @@ function fillSummary() {
   }
   document.getElementById('sumNombre').textContent = `${n} ${a}`;
   document.getElementById('sumTel').textContent = t;
-}
+  }
 
 // ═══════════════════════════════════════════════
 //  CONFIRMAR
 // ═══════════════════════════════════════════════
 async function confirmarTurno() {
   const svc = SERVICES.find(s => s.id === state.service);
+  const variant = (svc.variants && svc.variants.length && state.variant !== null) ? svc.variants[state.variant] : null;
+  const servicioNombre = variant ? `${svc.name} - ${variant.name}` : svc.name;
   const btn = document.querySelector('#panel4 .btn-confirm');
   const originalText = btn.textContent;
   btn.disabled = true;
@@ -1031,7 +1106,7 @@ async function confirmarTurno() {
   }
 
   const { data, error } = await sb.from('turnos').insert({
-    servicio: svc.name,
+    servicio: servicioNombre,
     duracion: svc.duration,
     fecha: state.date,
     hora: state.hour,
@@ -1063,8 +1138,13 @@ async function confirmarTurno() {
   document.getElementById('confirmCard').innerHTML = `
     <div class="confirm-row">
       <div class="confirm-row-icon">🌿</div>
-      <div><div class="confirm-row-label">Servicio</div><div class="confirm-row-text">${svc.name} · ${svc.duration}</div></div>
+      <div><div class="confirm-row-label">Servicio</div><div class="confirm-row-text">${servicioNombre} · ${svc.duration}</div></div>
     </div>
+    ${variant ? `
+    <div class="confirm-row">
+      <div class="confirm-row-icon">💰</div>
+      <div><div class="confirm-row-label">Precio</div><div class="confirm-row-text">$${variant.price.toLocaleString('es-AR')}</div></div>
+    </div>` : ''}
     <div class="confirm-row">
       <div class="confirm-row-icon">📅</div>
       <div><div class="confirm-row-label">Fecha</div><div class="confirm-row-text">${fechaStr}</div></div>
@@ -1101,16 +1181,19 @@ async function confirmarTurno() {
 
 function sendWhatsApp() {
   const svc = SERVICES.find(s => s.id === state.service);
+  const variant = (svc.variants && svc.variants.length && state.variant !== null) ? svc.variants[state.variant] : null;
+  const servicioNombre = variant ? `${svc.name} - ${variant.name}` : svc.name;
   const date = new Date(state.date+'T12:00:00');
   const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const months2 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const fechaStr = `${days[date.getDay()]} ${date.getDate()} de ${months2[date.getMonth()]}`;
-  const msg = `Hola Alambú 🌿 Acabo de reservar un turno:\n\n*Servicio:* ${svc.name}\n*Fecha:* ${fechaStr}\n*Horario:* ${state.hour} hs\n*Nombre:* ${state.nombre} ${state.apellido}\n\n¡Gracias!`;
+  const precioLine = variant ? `\n*Precio:* $${variant.price.toLocaleString('es-AR')}` : '';
+  const msg = `Hola Alambú 🌿 Acabo de reservar un turno:\n\n*Servicio:* ${servicioNombre}${precioLine}\n*Fecha:* ${fechaStr}\n*Horario:* ${state.hour} hs\n*Nombre:* ${state.nombre} ${state.apellido}\n\n¡Gracias!`;
   window.open(`https://wa.me/5492615371450?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 function resetForm() {
-  state = { step:1, service:null, date:null, hour:null, profesionalId:null, nombre:'', apellido:'', tel:'', email:'', notas:'' };
+  state = { step:1, service:null, variant:null, date:null, hour:null, profesionalId:null, nombre:'', apellido:'', tel:'', email:'', notas:'' };
   document.getElementById('inputNombre').value='';
   document.getElementById('inputApellido').value='';
   document.getElementById('inputTel').value='';
@@ -1175,7 +1258,7 @@ async function renderAdminPanel() {
   }
 
   // Add today if not present
-  if (!dates.includes(today)) dates.unshift(today);
+if (!dates.includes(today)) dates.unshift(today);
   else dates.sort();
 
   // Show last 7 dates + today
@@ -1329,4 +1412,4 @@ async function guardarDisponibilidad() {
 
 </script>
 </body>
-</html>
+</html>  
