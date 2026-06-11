@@ -282,7 +282,13 @@
     .turno-service { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; }
     .turno-phone { font-size: 11px; color: var(--brown-light); margin-top: 2px; }
     .turno-prof { font-size: 11px; color: var(--olive); margin-top: 2px; font-weight: 500; }
-    .turno-notes { font-size: 11px; color: var(--brown-light); font-style: italic; margin-top: 3px; }
+.turno-notes { font-size: 11px; color: var(--brown-light); font-style: italic; margin-top: 3px; }
+    .turno-remind-btn {
+      margin-top: 6px; padding: 5px 12px; font-size: 10px; letter-spacing: 0.06em;
+      text-transform: uppercase; border: 1px solid #25D366; color: #1EBE58; background: rgba(37,211,102,0.08);
+      border-radius: 4px; cursor: pointer; font-family: 'Jost', sans-serif; transition: all 0.2s;
+    }
+    .turno-remind-btn:hover { background: #25D366; color: #fff; }
     .turno-empty { text-align: center; padding: 2.5rem; color: var(--brown-light); font-size: 13px; }
     .turno-badge { font-size: 9px; background: var(--olive-light); color: #fff; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.08em; text-transform: uppercase; align-self: flex-start; margin-top: 2px; }
     .admin-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
@@ -1288,7 +1294,7 @@ function renderTurnosForDate(date) {
     document.getElementById('adminTurnosList').innerHTML = `<div class="turno-empty">Sin turnos para este día.</div>`;
     return;
   }
-  document.getElementById('adminTurnosList').innerHTML = dayTurnos.map(t => `
+  document.getElementById('adminTurnosList').innerHTML = dayTurnos.map((t, i) => `
     <div class="turno-card">
       <div class="turno-hora">${t.hour}</div>
       <div class="turno-info">
@@ -1297,10 +1303,27 @@ function renderTurnosForDate(date) {
         ${t.profesionalNombre ? `<div class="turno-prof">👩‍🦰 ${t.profesionalNombre}</div>` : ''}
         <div class="turno-phone">📱 ${t.tel}</div>
         ${t.notas ? `<div class="turno-notes">"${t.notas}"</div>` : ''}
+        <button class="turno-remind-btn" onclick="enviarRecordatorio(${i}, '${date}')">Recordar 📲</button>
       </div>
       <div class="turno-badge">${t.duration}</div>
     </div>
   `).join('');
+}
+
+function enviarRecordatorio(index, date) {
+  const dayTurnos = TURNOS.filter(t => t.date === date).sort((a,b) => a.hour.localeCompare(b.hour));
+  const t = dayTurnos[index];
+  if (!t) return;
+
+  const fecha = new Date(t.date+'T12:00:00');
+  const days = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const months2 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaStr = `${days[fecha.getDay()]} ${fecha.getDate()} de ${months2[fecha.getMonth()]}`;
+
+  const msg = `¡Hola ${t.nombre}! 🌿 Te recordamos tu turno en Alambú:\n\n*Servicio:* ${t.service}\n*Fecha:* ${fechaStr}\n*Horario:* ${t.hour} hs\n\nPor favor confirmanos si podés asistir. ¡Te esperamos!`;
+
+  const tel = (t.tel || '').replace(/[^0-9]/g, '');
+  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 // ═══════════════════════════════════════════════
