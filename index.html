@@ -78,7 +78,7 @@
     @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
 
     /* ── STEP 1: SERVICIO ── */
-.services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.5rem; }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.5rem; }
     .service-option {
       background: #fff; border: 1px solid var(--border); border-radius: 14px;
       cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
@@ -102,6 +102,7 @@
     .service-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; color: var(--brown); margin-bottom: 0.3rem; }
     .service-duration { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
     .service-desc-small { font-size: 11.5px; color: var(--brown-light); line-height: 1.5; }
+
     /* ── STEP 2: CALENDARIO ── */
     /* ── PROFESSIONAL PICKER ── */
     .prof-picker { margin-top: 1.5rem; }
@@ -287,8 +288,9 @@
 
 <!-- NAV -->
 <nav>
-<a href="#" class="nav-brand">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" width="40" height="40" role="img" aria-label="Alambú" class="nav-logo" style="flex-shrink:0;">      <circle cx="28" cy="28" r="27" fill="none" stroke="#B8924A" stroke-width="1"/>
+  <a href="#" class="nav-brand">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" width="40" height="40" role="img" aria-label="Alambú" class="nav-logo" style="flex-shrink:0;">
+      <circle cx="28" cy="28" r="27" fill="none" stroke="#B8924A" stroke-width="1"/>
       <circle cx="28" cy="28" r="23" fill="none" stroke="#6B7C5C" stroke-width="0.5"/>
       <path d="M28 41 C28 36 27 31 28 26 C29 21 27 17 28 13" fill="none" stroke="#6B7C5C" stroke-width="1.4" stroke-linecap="round"/>
       <path d="M28 30 C24 29 21 27 20 23 C24 23 27 25 28 28" fill="#8A9E76" stroke="#6B7C5C" stroke-width="0.8" stroke-linejoin="round"/>
@@ -525,7 +527,6 @@
         <button class="main-tab active" id="mainTabTurnos" onclick="switchMainTab('turnos')">Turnos</button>
         <button class="main-tab" id="mainTabDisp" onclick="switchMainTab('disponibilidad')">Disponibilidad</button>
       </div>
-
       <div id="adminTurnosSection">
         <div class="admin-stats" id="adminStats"></div>
         <div class="admin-day-tabs" id="adminDayTabs"></div>
@@ -570,13 +571,16 @@
 //  DATA
 // ═══════════════════════════════════════════════
 const SERVICES = [
-{ id: 1, icon: '👁️', name: 'Extensión de pestañas', duration: '90–120 min', desc: 'Pelo por pelo, clásica, volumen y mega volumen con materiales premium.', photo: 'https://picsum.photos/seed/alambu-pestanas/400/300' },
-{ id: 2, icon: '✨', name: 'Diseño de cejas', duration: '45–60 min', desc: 'Laminado y perfilado, henna y microblading para cejas definidas.', photo: 'https://picsum.photos/seed/alambu-cejas/400/300' },
-{ id: 3, icon: '🌿', name: 'Tratamiento facial', duration: '60–90 min', desc: 'Limpieza, hidratación, tratamiento Hidralips y rituales de luminosidad.', photo: 'https://picsum.photos/seed/alambu-facial/400/300' },
-{ id: 4, icon: '💆', name: 'Masajes relajantes', duration: '60 min', desc: 'Masajes ayurvédicos y experiencias que equilibran cuerpo y mente.', photo: 'https://picsum.photos/seed/alambu-masajes/400/300' },
-{ id: 5, icon: '🌸', name: 'Rituales de bienestar', duration: '75–90 min', desc: 'Tarot, Tameana, Péndulo Hebreo, Reiki, limpieza energética, Medium Unidad y Constelación Familiar.', photo: 'https://picsum.photos/seed/alambu-rituales/400/300' },
-{ id: 6, icon: '💅', name: 'Manicuría', duration: '60 min', desc: 'Cuidado completo para tus manos.', photo: 'https://picsum.photos/seed/alambu-manicuria/400/300' },
-;]
+  { id: 1, icon: '👁️', name: 'Extensión de pestañas', duration: '90–120 min', desc: 'Pelo por pelo, clásica, volumen y mega volumen con materiales premium.', photo: 'https://picsum.photos/seed/alambu-pestanas/400/300' },
+  { id: 2, icon: '✨', name: 'Diseño de cejas', duration: '45–60 min', desc: 'Laminado y perfilado, henna y microblading para cejas definidas.', photo: 'https://picsum.photos/seed/alambu-cejas/400/300' },
+  { id: 3, icon: '🌿', name: 'Tratamiento facial', duration: '60–90 min', desc: 'Limpieza, hidratación, tratamiento Hidralips y rituales de luminosidad.', photo: 'https://picsum.photos/seed/alambu-facial/400/300' },
+  { id: 4, icon: '💆', name: 'Masajes relajantes', duration: '60 min', desc: 'Masajes ayurvédicos y experiencias que equilibran cuerpo y mente.', photo: 'https://picsum.photos/seed/alambu-masajes/400/300' },
+  { id: 5, icon: '🌸', name: 'Rituales de bienestar', duration: '75–90 min', desc: 'Tarot, Tameana, Péndulo Hebreo, Reiki, limpieza energética, Medium Unidad y Constelación Familiar.', photo: 'https://picsum.photos/seed/alambu-rituales/400/300' },
+  { id: 6, icon: '💅', name: 'Manicuría', duration: '60 min', desc: 'Cuidado completo para tus manos.', photo: 'https://picsum.photos/seed/alambu-manicuria/400/300' },
+];
+
+const HORARIOS = ['09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30'];
+
 // Simulated taken slots (key = "YYYY-MM-DD_HH:MM")
 const TAKEN_DEMO = new Set();
 // Pre-fill some demo taken slots
@@ -667,7 +671,7 @@ async function cargarDisponibilidadProfesionales() {
 }
 
 // Disponibilidad por defecto para una profesional en una fecha, si no configuró nada:
-  // domingo cerrado, resto de días todos los horarios.
+// domingo cerrado, resto de días todos los horarios.
 function horariosBaseParaFecha(iso) {
   const dow = new Date(iso+'T12:00:00').getDay();
   if (dow === 0) return [];
@@ -692,7 +696,7 @@ function profesionalesParaServicio(serviceName) {
 
 // Devuelve la lista de horarios disponibles para un servicio en una fecha dada,
 // es decir: la unión de horarios donde AL MENOS UNA profesional capacitada
-// está disponible y no tiene ya un turno ocupado en ese horario.
+  // está disponible y no tiene ya un turno ocupado en ese horario.
 function horariosDisponiblesParaServicioYFecha(serviceName, iso, profesionalId) {
   let profesionales = profesionalesParaServicio(serviceName);
   if (profesionalId) profesionales = profesionales.filter(p => p.id === profesionalId);
@@ -790,21 +794,9 @@ function renderServices() {
     </div>
   `).join('');
 }
-function renderServices() {
-  const g = document.getElementById('servicesGrid');
-  g.innerHTML = SERVICES.map(s => `
-    <div class="service-option" id="svc_${s.id}" onclick="selectService(${s.id})">
-      <div class="service-photo" style="background-image:url('${s.photo}')">
-        <div class="service-icon-badge">${s.icon}</div>
-      </div>
-      <div class="service-body">
-        <div class="service-name">${s.name}</div>
-        <div class="service-duration">${s.duration}</div>
-        <div class="service-desc-small">${s.desc}</div>
-      </div>
-    </div>
-  `).join('');
-}
+
+// ═══════════════════════════════════════════════
+//  STEP NAVIGATION
 // ═══════════════════════════════════════════════
 function goTo(step) {
   // Validate
@@ -884,8 +876,7 @@ function changeMonth(dir) {
   document.getElementById('hoursTitle').textContent = 'Seleccioná primero una fecha';
   renderCalendar();
 }
-
-function renderCalendar() {
+  function renderCalendar() {
   const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   document.getElementById('calMonthLabel').textContent = `${months[calMonth]} ${calYear}`;
 
@@ -903,7 +894,7 @@ function renderCalendar() {
     const isPast = date < today;
     const iso = date.toISOString().slice(0,10);
     const sinHorarios = serviceName
-    ? horariosDisponiblesParaServicioYFecha(serviceName, iso, state.profesionalId).length === 0
+      ? horariosDisponiblesParaServicioYFecha(serviceName, iso, state.profesionalId).length === 0
       : diaCerrado(iso);
     const isToday = date.getTime() === today.getTime();
     const isSelected = state.date === iso;
@@ -1123,7 +1114,7 @@ function resetForm() {
 
 // ═══════════════════════════════════════════════
 //  ADMIN PANEL
-  // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 const ADMIN_PASSWORD = 'Fernalambu26'; // Change this!
 
 function openAdmin() {
