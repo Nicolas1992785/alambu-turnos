@@ -78,24 +78,30 @@
     @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
 
     /* ── STEP 1: SERVICIO ── */
-    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+.services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.5rem; }
     .service-option {
-      background: var(--cream-mid); border: 2px solid var(--border); border-radius: 8px;
-      padding: 1.5rem; cursor: pointer; transition: all 0.2s; position: relative;
+      background: #fff; border: 1px solid var(--border); border-radius: 14px;
+      cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
     }
     .service-option:hover { border-color: var(--olive-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(58,50,40,0.07); }
-    .service-option.selected { border-color: var(--olive); background: rgba(107,124,92,0.06); }
+    .service-option.selected { border: 2px solid var(--olive); }
     .service-option.selected::after {
-      content: '✓'; position: absolute; top: 10px; right: 12px;
+      content: '✓'; position: absolute; top: 10px; right: 10px;
       width: 22px; height: 22px; background: var(--olive); color: #fff;
       border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center;
-      font-weight: 600;
+      font-weight: 600; z-index: 2;
     }
-    .service-icon { font-size: 28px; margin-bottom: 0.7rem; }
+    .service-photo { position: relative; height: 110px; background-size: cover; background-position: center; }
+    .service-icon-badge {
+      position: absolute; left: 12px; bottom: -18px; width: 40px; height: 40px; border-radius: 50%;
+      background: var(--cream-mid); border: 2px solid #fff; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; box-shadow: 0 2px 6px rgba(58,50,40,0.12);
+    }
+    .service-body { padding: 26px 14px 16px; }
+    .service-icon { display: none; }
     .service-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; color: var(--brown); margin-bottom: 0.3rem; }
     .service-duration { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
     .service-desc-small { font-size: 11.5px; color: var(--brown-light); line-height: 1.5; }
-
     /* ── STEP 2: CALENDARIO ── */
     /* ── PROFESSIONAL PICKER ── */
     .prof-picker { margin-top: 1.5rem; }
@@ -565,14 +571,14 @@
 // ═══════════════════════════════════════════════
 const SERVICES = [
   { id: 1, icon: '👁️', name: 'Extensión de pestañas', duration: '90–120 min', desc: 'Pelo por pelo, clásica, volumen y mega volumen con materiales premium.' },
-  { id: 2, icon: '✨', name: 'Diseño de cejas', duration: '45–60 min', desc: 'Laminado y perfilado, henna y microblading para cejas definidas.' },
-  { id: 3, icon: '🌿', name: 'Tratamiento facial', duration: '60–90 min', desc: 'Limpieza, hidratación, tratamiento Hidralips y rituales de luminosidad.' },
-  { id: 4, icon: '💆', name: 'Masajes relajantes', duration: '60 min', desc: 'Masajes ayurvédicos y experiencias que equilibran cuerpo y mente.' },
-  { id: 5, icon: '🌸', name: 'Rituales de bienestar', duration: '75–90 min', desc: 'Tarot, Tameana, Péndulo Hebreo, Reiki, limpieza energética, Medium Unidad y Constelación Familiar.' },
-  { id: 6, icon: '💅', name: 'Manicuría', duration: '60 min', desc: 'Cuidado completo para tus manos.' },
-];
-
-const HORARIOS = ['09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30'];
+const SERVICES = [
+  { id: 1, icon: '👁️', name: 'Extensión de pestañas', duration: '90–120 min', desc: 'Pelo por pelo, clásica, volumen y mega volumen con materiales premium.', photo: 'https://source.unsplash.com/400x300/?eyelashes,beauty' },
+  { id: 2, icon: '✨', name: 'Diseño de cejas', duration: '45–60 min', desc: 'Laminado y perfilado, henna y microblading para cejas definidas.', photo: 'https://source.unsplash.com/400x300/?eyebrows,beauty' },
+  { id: 3, icon: '🌿', name: 'Tratamiento facial', duration: '60–90 min', desc: 'Limpieza, hidratación, tratamiento Hidralips y rituales de luminosidad.', photo: 'https://source.unsplash.com/400x300/?facial,skincare' },
+  { id: 4, icon: '💆', name: 'Masajes relajantes', duration: '60 min', desc: 'Masajes ayurvédicos y experiencias que equilibran cuerpo y mente.', photo: 'https://source.unsplash.com/400x300/?massage,spa' },
+  { id: 5, icon: '🌸', name: 'Rituales de bienestar', duration: '75–90 min', desc: 'Tarot, Tameana, Péndulo Hebreo, Reiki, limpieza energética, Medium Unidad y Constelación Familiar.', photo: 'https://source.unsplash.com/400x300/?meditation,wellness' },
+  { id: 6, icon: '💅', name: 'Manicuría', duration: '60 min', desc: 'Cuidado completo para tus manos.', photo: 'https://source.unsplash.com/400x300/?manicure,nails' },
+]; 
 
 // Simulated taken slots (key = "YYYY-MM-DD_HH:MM")
 const TAKEN_DEMO = new Set();
@@ -775,17 +781,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderServices() {
   const g = document.getElementById('servicesGrid');
   g.innerHTML = SERVICES.map(s => `
+function renderServices() {
+  const g = document.getElementById('servicesGrid');
+  g.innerHTML = SERVICES.map(s => `
     <div class="service-option" id="svc_${s.id}" onclick="selectService(${s.id})">
-      <div class="service-icon">${s.icon}</div>
-      <div class="service-name">${s.name}</div>
-      <div class="service-duration">${s.duration}</div>
-      <div class="service-desc-small">${s.desc}</div>
+      <div class="service-photo" style="background-image:url('${s.photo}')">
+        <div class="service-icon-badge">${s.icon}</div>
+      </div>
+      <div class="service-body">
+        <div class="service-name">${s.name}</div>
+        <div class="service-duration">${s.duration}</div>
+        <div class="service-desc-small">${s.desc}</div>
+      </div>
     </div>
   `).join('');
 }
-
-// ═══════════════════════════════════════════════
-//  STEP NAVIGATION
 // ═══════════════════════════════════════════════
 function goTo(step) {
   // Validate
