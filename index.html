@@ -91,9 +91,13 @@
       border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center;
       font-weight: 600; z-index: 2;
     }
-   .service-photo { position: relative; height: 90px; background: var(--cream-mid); display: flex; align-items: center; justify-content: center; }
-    .service-icon-badge { font-size: 36px; }
-    .service-body { padding: 16px 14px 16px; }
+ .service-photo { position: relative; height: 110px; background-size: cover; background-position: center; }
+    .service-icon-badge {
+      position: absolute; left: 12px; bottom: -18px; width: 40px; height: 40px; border-radius: 50%;
+      background: var(--cream-mid); border: 2px solid #fff; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; box-shadow: 0 2px 6px rgba(58,50,40,0.12);
+    }
+    .service-body { padding: 26px 14px 16px; }
     .service-icon { display: none; }
     .service-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; color: var(--brown); margin-bottom: 0.3rem; }
     .service-duration { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
@@ -567,12 +571,12 @@
 //  DATA
 // ═══════════════════════════════════════════════
 const SERVICES = [
-  { id: 1, icon: '👁️', name: 'Extensión de pestañas', duration: '90–120 min', desc: 'Pelo por pelo, clásica, volumen y mega volumen con materiales premium.', photo: 'https://picsum.photos/seed/alambu-pestanas/400/300' },
-  { id: 2, icon: '✨', name: 'Diseño de cejas', duration: '45–60 min', desc: 'Laminado y perfilado, henna y microblading para cejas definidas.', photo: 'https://picsum.photos/seed/alambu-cejas/400/300' },
-  { id: 3, icon: '🌿', name: 'Tratamiento facial', duration: '60–90 min', desc: 'Limpieza, hidratación, tratamiento Hidralips y rituales de luminosidad.', photo: 'https://picsum.photos/seed/alambu-facial/400/300' },
-  { id: 4, icon: '💆', name: 'Masajes relajantes', duration: '60 min', desc: 'Masajes ayurvédicos y experiencias que equilibran cuerpo y mente.', photo: 'https://picsum.photos/seed/alambu-masajes/400/300' },
-  { id: 5, icon: '🌸', name: 'Rituales de bienestar', duration: '75–90 min', desc: 'Tarot, Tameana, Péndulo Hebreo, Reiki, limpieza energética, Medium Unidad y Constelación Familiar.', photo: 'https://picsum.photos/seed/alambu-rituales/400/300' },
-  { id: 6, icon: '💅', name: 'Manicuría', duration: '60 min', desc: 'Cuidado completo para tus manos.', photo: 'https://picsum.photos/seed/alambu-manicuria/400/300' },
+{ id: 1, icon: '👁️', name: 'Extensión de pestañas', duration: '90–120 min', desc: 'Pelo por pelo, clásica, volumen y mega volumen con materiales premium.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/pestanas.jpg' },
+{ id: 2, icon: '✨', name: 'Diseño de cejas', duration: '45–60 min', desc: 'Laminado y perfilado, henna y microblading para cejas definidas.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/cejas.jpg' },
+{ id: 3, icon: '🌿', name: 'Tratamiento facial', duration: '60–90 min', desc: 'Limpieza, hidratación, tratamiento Hidralips y rituales de luminosidad.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/facial.jpg' },
+{ id: 4, icon: '💆', name: 'Masajes relajantes', duration: '60 min', desc: 'Masajes ayurvédicos y experiencias que equilibran cuerpo y mente.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/masajes.jpg' },
+{ id: 5, icon: '🌸', name: 'Rituales de bienestar', duration: '75–90 min', desc: 'Tarot, Tameana, Péndulo Hebreo, Reiki, limpieza energética, Medium Unidad y Constelación Familiar.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/bienestar.jpg' },
+{ id: 6, icon: '💅', name: 'Manicuría', duration: '60 min', desc: 'Cuidado completo para tus manos.', photo: 'https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/unas.jpg' },
 ];
 
 const HORARIOS = ['09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30'];
@@ -779,7 +783,7 @@ function renderServices() {
   const g = document.getElementById('servicesGrid');
   g.innerHTML = SERVICES.map(s => `
     <div class="service-option" id="svc_${s.id}" onclick="selectService(${s.id})">
-      <div class="service-photo">
+<div class="service-photo" style="background-image:url('${s.photo}')">
         <div class="service-icon-badge">${s.icon}</div>
       </div>
       <div class="service-body">
