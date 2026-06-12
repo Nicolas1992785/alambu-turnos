@@ -173,7 +173,7 @@
     .hour-slot.taken { background: var(--cream-dark); color: var(--border); cursor: not-allowed; text-decoration: line-through; }
 
     /* ── STEP 3: DATOS ── */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
     @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group.full { grid-column: 1 / -1; }
@@ -194,6 +194,21 @@
     .summary-key { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brown-light); }
     .summary-val { font-size: 14px; color: var(--brown); font-weight: 500; text-align: right; max-width: 60%; }
     .summary-note { font-size: 12px; color: var(--brown-light); margin-top: 1.2rem; line-height: 1.6; }
+    .sena-box { background: #FDF8EF; border: 1px solid var(--gold-light); border-radius: 10px; padding: 1.5rem; margin-top: 1.2rem; }
+    .sena-title { font-family: 'Cormorant Garamond', serif; font-size: 21px; color: var(--olive-dark); margin-bottom: 0.5rem; }
+    .sena-title strong { color: var(--gold); font-weight: 600; }
+    .sena-text { font-size: 13px; color: var(--brown-light); line-height: 1.6; margin-bottom: 1rem; }
+    .sena-alias-row { display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; background: var(--cream); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1rem; margin-bottom: 0.6rem; }
+    .sena-alias-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brown-light); }
+    .sena-alias { font-size: 15px; font-weight: 500; color: var(--brown); word-break: break-all; }
+    .sena-copy-btn { background: var(--olive); color: white; border: none; border-radius: 6px; padding: 0.45rem 0.9rem; font-family: 'Jost', sans-serif; font-size: 12px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .sena-copy-btn:hover { background: var(--olive-dark); }
+    .sena-note { font-size: 12px; color: var(--brown-light); line-height: 1.6; margin-top: 0.4rem; }
+    .sena-chip { display: inline-block; font-size: 11px; padding: 0.2rem 0.6rem; border-radius: 20px; margin-top: 0.4rem; }
+    .sena-chip.pendiente { background: #F7E8D0; color: #9A6B1F; border: 1px solid #E5C893; }
+    .sena-chip.confirmada { background: #E4EDDC; color: var(--olive-dark); border: 1px solid #BFD0AE; }
+    .sena-ok-btn { background: var(--gold); color: white; border: none; border-radius: 6px; padding: 0.3rem 0.7rem; font-family: 'Jost', sans-serif; font-size: 11px; cursor: pointer; margin-left: 0.4rem; vertical-align: middle; }
+    .sena-ok-btn:hover { background: var(--gold-light); }
 
     /* ── CONFIRMACION ── */
     .confirm-screen { text-align: center; padding: 3rem 2rem; animation: fadeIn 0.5s ease; }
@@ -402,7 +417,8 @@
   <!-- STEP 2: FECHA Y HORA -->
   <div class="step-panel" id="panel2">
     <div class="step-title">Elegí fecha y horario</div>
-<p class="step-subtitle">Atendemos de lunes a sábado de 9:30 a 20:00 hs · Los turnos se reservan con al menos 12 hs de anticipación</p>
+    <p class="step-subtitle">Atendemos de lunes a sábado de 9:30 a 20:00 hs · Los turnos se reservan con al menos 12 hs de anticipación</p>
+
     <div class="prof-picker" id="profPicker">
       <p class="form-label" style="margin-bottom:0.6rem;">¿Con quién querés atenderte?</p>
       <div class="prof-options" id="profOptions"></div>
@@ -507,9 +523,22 @@
         <span class="summary-val" id="sumNombre">—</span>
       </div>
       <div class="summary-row">
-        <span class="summary-key">Teléfono</span>
+     <span class="summary-key">Teléfono</span>
         <span class="summary-val" id="sumTel">—</span>
       </div>
+    </div>
+    <div class="sena-box" id="senaBox" style="display:none;">
+      <div class="sena-title">Seña para reservar: <strong id="senaMonto">—</strong></div>
+      <p class="sena-text">Para confirmar tu turno te pedimos una seña del 30% del valor del servicio. Podés transferirla a cualquiera de estos alias:</p>
+      <div class="sena-alias-row">
+        <div><div class="sena-alias-label">Mercado Pago</div><div class="sena-alias">soyabundancia963</div></div>
+        <button class="sena-copy-btn" onclick="copiarAlias('soyabundancia963', this)">Copiar</button>
+      </div>
+      <div class="sena-alias-row">
+        <div><div class="sena-alias-label">Banco Santander</div><div class="sena-alias">studio.ciara</div></div>
+        <button class="sena-copy-btn" onclick="copiarAlias('studio.ciara', this)">Copiar</button>
+      </div>
+      <p class="sena-note">Tu turno quedará <strong>pendiente</strong> hasta que verifiquemos la seña. Luego de confirmar, envianos el comprobante por WhatsApp 💬</p>
     </div>
     <p class="summary-note">
       ✦ Al confirmar, te enviaremos los detalles por WhatsApp. Recordá cancelar con al menos 24 hs de anticipación.
@@ -629,6 +658,44 @@ function horarioPermitido(iso, hora) {
   const limite = new Date(Date.now() + MIN_ANTICIPACION_HORAS * 60 * 60 * 1000);
   return slot >= limite;
 }
+
+// ── SEÑA ──────────────────────────────────────
+const SENA_PORCENTAJE = 30; // % del precio del servicio
+const SENA_ALIAS = [
+  { label: 'Mercado Pago', alias: 'soyabundancia963' },
+  { label: 'Banco Santander', alias: 'studio.ciara' }
+];
+
+// Precio del servicio/técnica elegida (null si el servicio no tiene precio cargado)
+function precioSeleccionado() {
+  const svc = SERVICES.find(s => s.id === state.service);
+  if (!svc) return null;
+  if (svc.variants && svc.variants.length && state.variant !== null) return svc.variants[state.variant].price;
+  return svc.price || null;
+}
+
+// Monto de la seña (null si no hay precio → no se pide seña)
+function montoSena() {
+  const p = precioSeleccionado();
+  return p ? Math.round(p * SENA_PORCENTAJE / 100) : null;
+}
+
+function copiarAlias(alias, btn) {
+  const done = () => {
+    const orig = btn.textContent;
+    btn.textContent = '¡Copiado!';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  };
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = alias; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch(e) {}
+    document.body.removeChild(ta);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(alias).then(done).catch(fallback);
+  } else fallback();
+}
 // Simulated taken slots (key = "YYYY-MM-DD_HH:MM")
 const TAKEN_DEMO = new Set();
 // Pre-fill some demo taken slots
@@ -687,6 +754,8 @@ async function cargarTurnos() {
     notas: t.notas,
     profesionalId: t.profesional_id,
     profesionalNombre: t.profesional_nombre,
+    senaMonto: t.sena_monto,
+    senaEstado: t.sena_estado,
     createdAt: t.created_at
   }));
 }
@@ -803,8 +872,8 @@ function asignarProfesional(serviceName, iso, hora, profesionalId) {
 
 // Devuelve la lista de horarios habilitados para una fecha dada,
 // considerando configuración manual o el comportamiento por defecto.
-function horariosDisponiblesParaFecha(iso) {
-  const config = DISPONIBILIDAD[iso];
+function horariosDisponiblesParaFecha(iso) { 
+const config = DISPONIBILIDAD[iso];
   if (config) {
     if (config.cerrado) return [];
     return config.horarios && config.horarios.length ? config.horarios : HORARIOS;
@@ -978,7 +1047,6 @@ function changeMonth(dir) {
   document.getElementById('hoursTitle').textContent = 'Seleccioná primero una fecha';
   renderCalendar();
 }
-
 function renderCalendar() {
   const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   document.getElementById('calMonthLabel').textContent = `${months[calMonth]} ${calYear}`;
@@ -1104,6 +1172,14 @@ function fillSummary() {
   }
   document.getElementById('sumNombre').textContent = `${n} ${a}`;
   document.getElementById('sumTel').textContent = t;
+
+  const sena = montoSena();
+  if (sena) {
+    document.getElementById('senaMonto').textContent = `$${sena.toLocaleString('es-AR')}`;
+    document.getElementById('senaBox').style.display = 'block';
+  } else {
+    document.getElementById('senaBox').style.display = 'none';
+  }
   }
 
 // ═══════════════════════════════════════════════
@@ -1142,10 +1218,11 @@ async function confirmarTurno() {
     email: state.email || null,
     notas: state.notas || null,
     profesional_id: profesional.id,
-    profesional_nombre: profesional.nombre
+    profesional_nombre: profesional.nombre,
+    sena_monto: montoSena(),
+    sena_estado: montoSena() ? 'pendiente' : null
   }).select();
-
- if (error) {
+  if (error) {
     console.error('Error al guardar turno:', error);
     btn.disabled = false;
     btn.textContent = originalText;
@@ -1188,6 +1265,11 @@ async function confirmarTurno() {
     <div class="confirm-row">
       <div class="confirm-row-icon">💰</div>
       <div><div class="confirm-row-label">Precio</div><div class="confirm-row-text">$${variant.price.toLocaleString('es-AR')}</div></div>
+    </div>` : ''}
+    ${montoSena() ? `
+    <div class="confirm-row">
+      <div class="confirm-row-icon">💛</div>
+      <div><div class="confirm-row-label">Seña (${SENA_PORCENTAJE}%)</div><div class="confirm-row-text">$${montoSena().toLocaleString('es-AR')} · pendiente de verificación</div></div>
     </div>` : ''}
     <div class="confirm-row">
       <div class="confirm-row-icon">📅</div>
@@ -1232,7 +1314,8 @@ function sendWhatsApp() {
   const months2 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const fechaStr = `${days[date.getDay()]} ${date.getDate()} de ${months2[date.getMonth()]}`;
   const precioLine = variant ? `\n*Precio:* $${variant.price.toLocaleString('es-AR')}` : '';
-  const msg = `Hola Alambú 🌿 Acabo de reservar un turno:\n\n*Servicio:* ${servicioNombre}${precioLine}\n*Fecha:* ${fechaStr}\n*Horario:* ${state.hour} hs\n*Nombre:* ${state.nombre} ${state.apellido}\n\n¡Gracias!`;
+  const senaLine = montoSena() ? `\n*Seña (${SENA_PORCENTAJE}%):* $${montoSena().toLocaleString('es-AR')} — a continuación envío el comprobante 📎` : '';
+  const msg = `Hola Alambú 🌿 Acabo de reservar un turno:\n\n*Servicio:* ${servicioNombre}${precioLine}${senaLine}\n*Fecha:* ${fechaStr}\n*Horario:* ${state.hour} hs\n*Nombre:* ${state.nombre} ${state.apellido}\n\n¡Gracias!`;
   window.open(`https://wa.me/5492615371450?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
@@ -1313,7 +1396,7 @@ if (!dates.includes(today)) dates.unshift(today);
   document.getElementById('adminDayTabs').innerHTML = displayDates.map(d => {
     const dt = new Date(d+'T12:00:00');
     const label = d === today ? 'Hoy' : `${dt.getDate()} ${months2[dt.getMonth()]}`;
-    return `<button class="day-tab ${d===activeDate?'active':''}" onclick="switchAdminDay('${d}', this)">${label}</button>`;
+return `<button class="day-tab ${d===activeDate?'active':''}" onclick="switchAdminDay('${d}', this)">${label}</button>`;
   }).join('');
 
   renderTurnosForDate(activeDate);
@@ -1340,6 +1423,8 @@ function renderTurnosForDate(date) {
         ${t.profesionalNombre ? `<div class="turno-prof">👩‍🦰 ${t.profesionalNombre}</div>` : ''}
         <div class="turno-phone">📱 ${t.tel}</div>
         ${t.notas ? `<div class="turno-notes">"${t.notas}"</div>` : ''}
+        ${t.senaEstado === 'pendiente' ? `<div><span class="sena-chip pendiente">🕐 Seña pendiente${t.senaMonto ? ` · $${t.senaMonto.toLocaleString('es-AR')}` : ''}</span><button class="sena-ok-btn" onclick="marcarSenado('${t.id}', '${date}')">Señado ✓</button></div>` : ''}
+        ${t.senaEstado === 'confirmada' ? `<div><span class="sena-chip confirmada">✓ Señada${t.senaMonto ? ` · $${t.senaMonto.toLocaleString('es-AR')}` : ''}</span></div>` : ''}
         <button class="turno-remind-btn" onclick="enviarRecordatorio(${i}, '${date}')">Recordar 📲</button>
       </div>
       <div class="turno-badge">${t.duration}</div>
@@ -1361,6 +1446,17 @@ function enviarRecordatorio(index, date) {
 
   const tel = (t.tel || '').replace(/[^0-9]/g, '');
   window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+async function marcarSenado(id, date) {
+  const { error } = await sb.from('turnos').update({ sena_estado: 'confirmada' }).eq('id', id);
+  if (error) {
+    console.error('Error al marcar seña:', error);
+    alert('No se pudo actualizar la seña. Revisá la conexión e intentá de nuevo.');
+    return;
+  }
+  await cargarTurnos();
+  renderTurnosForDate(date);
 }
 
 // ═══════════════════════════════════════════════
@@ -1473,4 +1569,4 @@ async function guardarDisponibilidad() {
 
 </script>
 </body>
-</html>  
+</html>    
