@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -633,7 +633,18 @@ const dd = demoDate.toISOString().slice(0,10);
 // ═══════════════════════════════════════════════
 const SUPABASE_URL = 'https://enbiwgxdtimisgnjjmch.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_iQh_3Ojf_ULpAfub3tXeDA_qh8yMX0q';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);// ═══════════════════════════════════════════════
+//  EMAILJS (notificaciones de nuevo turno)
+// ═══════════════════════════════════════════════
+const EMAILJS_SERVICE_ID = 'service_aioiha2';
+const EMAILJS_TEMPLATE_ID = 'template_vhel13k';
+const EMAILJS_PUBLIC_KEY = 'P5OYfMI4uLyYqGf-m';
+emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+function notificarNuevoTurno(params) {
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
+    .catch(err => console.error('Error enviando notificación de email:', err));
+}
 
 // Storage for turnos (cargado desde Supabase)
 let TURNOS = [];
@@ -1126,13 +1137,31 @@ async function confirmarTurno() {
     profesional_nombre: profesional.nombre
   }).select();
 
-  if (error) {
+ if (error) {
     console.error('Error al guardar turno:', error);
     btn.disabled = false;
     btn.textContent = originalText;
     alert('Hubo un problema al guardar tu turno. Por favor, intentá de nuevo o escribinos por WhatsApp.');
     return;
   }
+
+  // Build fecha string para el resumen/email
+  const fechaParaMail = new Date(state.date+'T12:00:00');
+  const daysMail = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const monthsMail = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaStrMail = `${daysMail[fechaParaMail.getDay()]} ${fechaParaMail.getDate()} de ${monthsMail[fechaParaMail.getMonth()]} de ${fechaParaMail.getFullYear()}`;
+
+  notificarNuevoTurno({
+    servicio: servicioNombre + (variant ? ` ($${variant.price.toLocaleString('es-AR')})` : ''),
+    fecha: fechaStrMail,
+    horario: state.hour + ' hs',
+    profesional: profesional.nombre,
+    nombre: state.nombre,
+    apellido: state.apellido,
+    telefono: state.tel,
+    email: state.email || '-',
+    notas: state.notas || '-'
+  });
 
   await cargarTurnos();
 
