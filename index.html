@@ -659,6 +659,16 @@ function horarioPermitido(iso, hora) {
   return slot >= limite;
 }
 
+// ── AUTO-AVANCE EN MÓVIL ──────────────────────
+// En pantallas chicas, al elegir un ítem avanzamos solos al paso siguiente
+// (en compu se mantiene el botón). Pequeño delay para que se vea la selección.
+function esMovil() {
+  return window.matchMedia('(max-width: 600px)').matches;
+}
+function avanzarEnMovil(step) {
+  if (esMovil()) setTimeout(() => goTo(step), 200);
+}
+
 // ── SEÑA ──────────────────────────────────────
 const SENA_PORCENTAJE = 30; // % del precio del servicio
 const SENA_ALIAS = [
@@ -977,9 +987,10 @@ function selectService(id) {
     document.getElementById('nextToStep2').disabled = true;
     renderVariants();
     goTo(1.5);
-  } else {
+} else {
     document.getElementById('nextToStep2').disabled = false;
     renderProfOptions();
+    avanzarEnMovil(2);
   }
 }
 
@@ -1000,6 +1011,7 @@ function selectVariant(i) {
   state.variant = i;
   renderVariants();
   renderProfOptions();
+  avanzarEnMovil(2);
 }
 
 function goBackFromStep2() {
@@ -1118,12 +1130,13 @@ function renderHours(iso) {
   });
   document.getElementById('hoursGrid').innerHTML = html;
 }
-
 function selectHour(h) {
   state.hour = h;
   document.getElementById('nextToStep3').disabled = false;
   renderHours(state.date);
+  avanzarEnMovil(3);
 }
+
 
 // ═══════════════════════════════════════════════
 //  STEP 3: DATOS
