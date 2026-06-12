@@ -620,7 +620,16 @@ const SERVICES = [
 
 
 const HORARIOS = ['09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30'];
+// Anticipación mínima para reservar (en horas). Un turno solo se puede
+// reservar si falta al menos este tiempo para el horario elegido.
+const MIN_ANTICIPACION_HORAS = 12;
 
+// Devuelve true si el horario (fecha + hora) cumple la anticipación mínima
+function horarioPermitido(iso, hora) {
+  const slot = new Date(iso + 'T' + hora + ':00');
+  const limite = new Date(Date.now() + MIN_ANTICIPACION_HORAS * 60 * 60 * 1000);
+  return slot >= limite;
+}
 // Simulated taken slots (key = "YYYY-MM-DD_HH:MM")
 const TAKEN_DEMO = new Set();
 // Pre-fill some demo taken slots
@@ -769,7 +778,7 @@ function horariosDisponiblesParaServicioYFecha(serviceName, iso, profesionalId) 
     });
   });
 
-  return HORARIOS.filter(h => disponibles.has(h));
+return HORARIOS.filter(h => disponibles.has(h) && horarioPermitido(iso, h));
 }
 
 // Asigna automáticamente una profesional disponible para un servicio, fecha y hora dados.
