@@ -1,0 +1,16 @@
+{
+  "name": "Alambú",
+  "short_name": "Alambú",
+  "description": "Belleza y bienestar para volver a vos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F9F5F5",
+  "theme_color": "#FF4D7A",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/og-image.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
