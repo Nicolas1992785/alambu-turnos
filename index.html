@@ -2,7 +2,13 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Alambú">
+  <meta name="theme-color" content="#FF4D7A">
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/og-image.png">
   <title>Alambú · Reservar Turno</title>
   <meta name="description" content="Reservá tu turno online en Alambú. Belleza y bienestar para volver a vos.">
   <meta property="og:title" content="Alambú · Reservar Turno">
@@ -18,6 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Alambú&quot;,&quot;short_name&quot;:&quot;Alambú&quot;,&quot;start_url&quot;:&quot;/&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23F9F5F5&quot;,&quot;theme_color&quot;:&quot;%23FF4D7A&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;https://raw.githubusercontent.com/Nicolas1992785/alambu-turnos/main/og-image.png&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/png&quot;}]}">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.0/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
@@ -60,6 +67,9 @@
       color: var(--text-primary);
       background: var(--bg);
       min-height: 100vh;
+      /* Safe area para notch/Dynamic Island */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     /* ════════════════════════════════
@@ -659,11 +669,134 @@
     footer a { color: var(--pink); text-decoration: none; }
 
     @media (max-width: 600px) {
-      nav { padding: 0.9rem 1.2rem; }
-      .booking-wrapper { padding: 1.5rem 1rem 3rem; }
-      .page-header { padding: 2.8rem 1.2rem 1.8rem; }
-      .page-title { font-size: 36px; }
-      .confirm-card { padding: 1.2rem; }
+      /* NAV mobile */
+      nav {
+        padding: 0.7rem 1rem;
+        gap: 8px;
+      }
+      .nav-brand-name { font-size: 18px; }
+      .nav-brand-sub { display: none; }
+      .nav-logo { width: 34px; height: 34px; }
+      .nav-right { gap: 0.6rem; }
+      .nav-right a { display: none; }
+      .btn-admin {
+        padding: 7px 14px;
+        font-size: 10px;
+        white-space: nowrap;
+      }
+
+      /* HEADER mobile */
+      .page-header {
+        padding: 2rem 1.2rem 1.4rem;
+      }
+      .page-header::before { width: 140px; height: 140px; top: -40px; right: -30px; }
+      .page-header::after { width: 100px; height: 100px; bottom: -30px; left: -20px; }
+      .page-eyebrow { font-size: 9px; }
+      .page-title { font-size: 32px; }
+      .page-subtitle { font-size: 13px; }
+
+      /* STEPPER mobile */
+      .stepper { padding: 1rem 1.2rem; gap: 0; }
+      .step-num { width: 28px; height: 28px; font-size: 11px; }
+      .step-line { width: 12px; margin: 0 4px; }
+
+      /* BOOKING */
+      .booking-wrapper { padding: 1.2rem 0.9rem 4rem; }
+      .step-title { font-size: 24px; }
+      .step-subtitle { font-size: 12px; }
+
+      /* SERVICES — 1 columna en mobile, cards horizontales */
+      .services-grid {
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+      }
+      .service-option {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        border-radius: 18px;
+      }
+      .service-photo {
+        width: 100px;
+        min-width: 100px;
+        height: 100px;
+        border-radius: 16px 0 0 16px;
+        flex-shrink: 0;
+      }
+      .service-icon-badge {
+        left: 8px;
+        bottom: 8px;
+        width: 32px;
+        height: 32px;
+        font-size: 15px;
+      }
+      .service-body {
+        padding: 14px 14px 14px 20px;
+        flex: 1;
+      }
+      .service-name { font-size: 16px; margin-bottom: 0.2rem; }
+      .service-duration { font-size: 10px; margin-bottom: 0.3rem; }
+      .service-desc-small { font-size: 11px; line-height: 1.4;
+        display: -webkit-box; -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical; overflow: hidden;
+      }
+      .service-option.selected::after {
+        top: 8px; right: 8px;
+        width: 20px; height: 20px; font-size: 10px;
+      }
+
+      /* VARIANTES mobile */
+      .variant-option { padding: 0.9rem 1.2rem; }
+      .variant-name { font-size: 17px; }
+      .variant-price { font-size: 15px; }
+
+      /* PROFESIONAL mobile */
+      .prof-options { gap: 0.5rem; }
+      .prof-option { padding: 8px 14px; font-size: 12px; }
+
+      /* CALENDARIO mobile */
+      .calendar-layout { gap: 1rem; }
+      .calendar-box { padding: 1.2rem; border-radius: 18px; }
+      .cal-month { font-size: 18px; }
+      .cal-cell { font-size: 12px; }
+      .hours-box { padding: 1.2rem; border-radius: 18px; }
+      .hours-title { font-size: 17px; margin-bottom: 0.8rem; }
+      .hour-slot { padding: 8px 13px; font-size: 12px; }
+      .hours-group-label { font-size: 9px; margin: 0.6rem 0 0.4rem; }
+
+      /* FORM mobile */
+      .form-input { padding: 12px 14px; font-size: 13px; border-radius: 14px; }
+      textarea.form-input { min-height: 72px; }
+
+      /* RESUMEN mobile */
+      .summary-box { padding: 1.4rem; border-radius: 18px; }
+      .summary-key { font-size: 10px; }
+      .summary-val { font-size: 13px; }
+      .sena-box { padding: 1.2rem; border-radius: 18px; }
+      .sena-title { font-size: 19px; }
+      .sena-alias-row { padding: 0.7rem 0.9rem; }
+      .sena-alias { font-size: 13px; }
+
+      /* BOTONES mobile */
+      .nav-buttons { margin-top: 1.5rem; padding-top: 1.2rem; }
+      .btn-next, .btn-back, .btn-confirm {
+        padding: 13px 22px;
+        font-size: 11px;
+        border-radius: 28px;
+      }
+
+      /* CONFIRMACIÓN mobile */
+      .confirm-card { padding: 1.2rem; border-radius: 18px; }
+      .confirm-title { font-size: 34px; }
+      .confirm-icon-wrap { width: 76px; height: 76px; font-size: 36px; }
+      .whatsapp-btn { padding: 13px 24px; font-size: 12px; }
+    }
+
+    /* Muy pequeño (iPhone SE etc) */
+    @media (max-width: 375px) {
+      .page-title { font-size: 28px; }
+      .step-title { font-size: 21px; }
+      .service-photo { width: 86px; min-width: 86px; height: 86px; }
     }
   </style>
 </head>
@@ -1585,6 +1718,35 @@ async function guardarDisponibilidad() {
   await cargarDisponibilidadProfesionales();
   const msg = document.getElementById('dispSavedMsg'); msg.classList.add('show'); setTimeout(() => msg.classList.remove('show'), 2500);
 }
+</script>
+<!-- BANNER PWA -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:var(--white);border-top:1.5px solid var(--border);padding:14px 20px 20px;box-shadow:0 -4px 24px rgba(0,0,0,0.10);animation:slideUp .3s ease;">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:48px;height:48px;border-radius:12px;background:var(--pink-light);border:1.5px solid var(--pink-mid);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">🌿</div>
+    <div style="flex:1;">
+      <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Alambú</div>
+      <div style="font-size:12px;color:var(--text-secondary);">Agregá la app a tu pantalla de inicio</div>
+    </div>
+    <button onclick="installPWA()" style="background:var(--pink);color:white;border:none;border-radius:20px;padding:9px 18px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 4px 12px rgba(255,77,122,0.3);">Instalar</button>
+    <button onclick="document.getElementById('pwa-banner').style.display='none'" style="background:none;border:none;font-size:20px;color:var(--text-hint);cursor:pointer;padding:4px;line-height:1;">×</button>
+  </div>
+</div>
+<style>
+@keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+</style>
+
+<script>
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setTimeout(() => { document.getElementById('pwa-banner').style.display = 'block'; }, 3000);
+});
+function installPWA() {
+  document.getElementById('pwa-banner').style.display = 'none';
+  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; }); }
+}
+window.addEventListener('appinstalled', () => { document.getElementById('pwa-banner').style.display = 'none'; });
 </script>
 </body>
 </html>
